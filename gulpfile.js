@@ -218,12 +218,12 @@ gulp.task("release:build", ['release:minify:html', 'release:minify:css', 'releas
 
 gulp.task('zip', ['release:build'], function () {
     return gulp.src('build/release/**/*')
-        .pipe(zip('js13k.zip'))
+        .pipe(zip('game.zip'))
         .pipe(gulp.dest('dist'));
 });
 
 gulp.task('report', ['zip'], function (done) {
-    var stat = fs.statSync('dist/js13k.zip'),
+    var stat = fs.statSync('dist/game.zip'),
         limit = 1024 * 13,
         size = stat.size,
         remaining = limit - size,
