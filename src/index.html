@@ -1,0 +1,24 @@
+<html>
+<head>
+    <title>Game</title>
+    <link rel="stylesheet" href="css/style.css">
+    <script src="js/app.js"></script>
+</head>
+<body>
+    <!-- @ifdef DEBUG -->
+    <div class="container">
+        <div id="overlay">
+            <div>frame/sec:
+                <span id="fps"></span>
+            </div>
+            <div>ms/frame:
+                <span id="ms"></span>
+            </div>
+        </div>
+    </div>
+    <!-- @endif -->
+    <div id="stage">
+        <canvas id="canvas" width="256" height="144"></canvas>
+    </div>
+</body>
+</html>

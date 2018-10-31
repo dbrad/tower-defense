@@ -1,0 +1,5 @@
+{
+    "javascript.referencesCodeLens.enabled": true,
+    "javascript.validate.enable": true,
+    "git.ignoreLimitWarning": true
+}

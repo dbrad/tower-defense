@@ -1,0 +1,16 @@
+{
+    "include": [
+        "src/ts/**/app.ts"
+    ],
+    "exclude": [
+        "node_modules",
+        "**/*.spec.ts"
+    ],
+    "compilerOptions": {
+        "module": "none",
+        "outFile": "app.js",
+        "noEmitOnError": true,
+        "noImplicitAny": true,
+        "target": "es2015"
+    }
+}
