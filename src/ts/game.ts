@@ -36,6 +36,10 @@ namespace Game {
                 duration: 0
             }],
             "walk": [{
+                texture: "guy_02",
+                duration: 250
+            },
+            {
                 texture: "guy_stand",
                 duration: 250
             },
@@ -46,11 +50,7 @@ namespace Game {
             {
                 texture: "guy_stand",
                 duration: 250
-            },
-            {
-                texture: "guy_02",
-                duration: 250
-            },
+            }
             ]
         }
     }
@@ -63,25 +63,26 @@ namespace Game {
         for(let sprite of spriteData) {
             Gfx.Sprite.CreateAndStore(sprite);
         }
-
+        
         Engine.Tile.CreateAndStore(
             "north_wall", 
             Assets.TextureStore['brick'],
-            0xFF3333AA,
+            0xFFff6777,
             true
         );
 
+        // 0xAABBGGRR
         Engine.Tile.CreateAndStore(
             "wall", 
             Assets.TextureStore['brick'],
-            0xFF3333AA,
+            0xFFff6777,
             true
         );
 
         Engine.Tile.CreateAndStore(
             "floor", 
             Assets.TextureStore['brick'],
-            0xFF333355,
+            0xFF2d2d2d,
             false
         );
 

@@ -1,3 +1,5 @@
+/// <reference path="util.ts" />
+
 namespace Engine {
     export interface Camera {
         position: V2;

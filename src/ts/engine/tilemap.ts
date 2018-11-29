@@ -2,6 +2,7 @@
 /// <reference path="gl.ts" />
 /// <reference path="assets.ts" />
 /// <reference path="lighting.ts" />
+/// <reference path="graphics.ts" />
 
 namespace Engine {
     export let TileStorage: { [key: string]: Tile } = {};
