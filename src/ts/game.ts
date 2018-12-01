@@ -1,8 +1,8 @@
 /// <reference path="engine/core.ts" />
 /// <reference path="engine/assets.ts" />
 /// <reference path="engine/graphics.ts" />
-/// <reference path="scenes/mainmenu.ts" />
-/// <reference path="scenes/main.ts" />
+/// <reference path="scenes/title-menu/title-menu.ts" />
+/// <reference path="scenes/game/game.ts" />
 /// <reference path="engine/util.ts" />
 
 namespace Game {
@@ -10,6 +10,7 @@ namespace Game {
     import Gfx = Engine.Graphics;
     import Assets = Engine.Assets;
 
+    //#region Sprite Data
     let spriteData: Gfx.SpriteDef[] = [{
         name: "dude01",
         animations: {
@@ -55,17 +56,23 @@ namespace Game {
         }
     }
     ];
+    //#endregion
+    export interface GameState {
+        version: string;
+    }
+
+    export let gameState: GameState = null;
 
     export function setup(): void {
-        Core.addScene(Scenes.MainMenu);
-        Core.addScene(Scenes.Main);
+        Core.addScene(Scenes.TitleMenu);
+        Core.addScene(Scenes.Game);
 
-        for(let sprite of spriteData) {
+        for (let sprite of spriteData) {
             Gfx.Sprite.CreateAndStore(sprite);
         }
-        
+
         Engine.Tile.CreateAndStore(
-            "north_wall", 
+            "north_wall",
             Assets.TextureStore['brick'],
             0xFFff6777,
             true
@@ -73,14 +80,14 @@ namespace Game {
 
         // 0xAABBGGRR
         Engine.Tile.CreateAndStore(
-            "wall", 
+            "wall",
             Assets.TextureStore['brick'],
             0xFFff6777,
             true
         );
 
         Engine.Tile.CreateAndStore(
-            "floor", 
+            "floor",
             Assets.TextureStore['brick'],
             0xFF2d2d2d,
             false
@@ -97,6 +104,6 @@ namespace Game {
 
         Gfx.NinePatchStore["dialog"] = dialog;
 
-        Core.pushScene("MainMenu");
+        Core.pushScene("TitleMenu");
     }
 }

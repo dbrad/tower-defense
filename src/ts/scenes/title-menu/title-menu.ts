@@ -1,8 +1,8 @@
-/// <reference path="../engine/core.ts" />
-/// <reference path="../engine/gl.ts" />
-/// <reference path="../engine/assets.ts" />
-/// <reference path="../engine/graphics.ts" />
-/// <reference path="../engine/input.ts" />
+/// <reference path="../../engine/core.ts" />
+/// <reference path="../../engine/gl.ts" />
+/// <reference path="../../engine/assets.ts" />
+/// <reference path="../../engine/graphics.ts" />
+/// <reference path="../../engine/input.ts" />
 
 namespace Scenes {
     import E = Engine;
@@ -13,12 +13,12 @@ namespace Scenes {
     import GL = E.GL;
 
     let sel = 0;
-    export let MainMenu: E.Scene = {
-        name: "MainMenu",
+    export let TitleMenu: E.Scene = {
+        name: "TitleMenu",
         transitionIn() {
             Input.bindControl("DOWN", () => { sel += 1; if (sel > 2) sel = 0; });
             Input.bindControl("UP", () => { sel -= 1; if (sel < 0) sel = 2; });
-            Input.bindControl("ACTION", () => { Core.pushScene("Main"); });
+            Input.bindControl("ACTION", () => { Core.pushScene("Game"); });
         },
         transitionOut() {
             Input.unbindControl("DOWN");

@@ -1,11 +1,11 @@
-/// <reference path="../engine/core.ts" />
-/// <reference path="../engine/gl.ts" />
-/// <reference path="../engine/assets.ts" />
-/// <reference path="../engine/graphics.ts" />
-/// <reference path="../engine/input.ts" />
-/// <reference path="../engine/entity.ts" />
-/// <reference path="../engine/camera.ts" />
-/// <reference path="../systems.ts" />
+/// <reference path="../../engine/core.ts" />
+/// <reference path="../../engine/gl.ts" />
+/// <reference path="../../engine/assets.ts" />
+/// <reference path="../../engine/graphics.ts" />
+/// <reference path="../../engine/input.ts" />
+/// <reference path="../../engine/entity.ts" />
+/// <reference path="../../engine/camera.ts" />
+/// <reference path="../../systems.ts" />
 
 namespace Scenes {
     import E = Engine;
@@ -39,8 +39,8 @@ namespace Scenes {
     let camera: Engine.Camera =
         Engine.Camera.create({ x: 0, y: 0 }, { x: 24 * 8, y: 18 * 8 });
 
-    export let Main: E.Scene = {
-        name: "Main",
+    export let Game: E.Scene = {
+        name: "Game",
         transitionIn() {
             Input.bindControl("RIGHT", () => {
                 player["movingRight"].value = true;
