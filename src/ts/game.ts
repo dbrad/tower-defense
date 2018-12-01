@@ -3,6 +3,8 @@
 /// <reference path="engine/graphics.ts" />
 /// <reference path="scenes/title-menu/title-menu.ts" />
 /// <reference path="scenes/game/game.ts" />
+/// <reference path="scenes/settings-menu/settings-menu.ts" />
+/// <reference path="scenes/post-game/post-game.ts" />
 /// <reference path="engine/util.ts" />
 
 namespace Game {
@@ -65,7 +67,9 @@ namespace Game {
 
     export function setup(): void {
         Core.addScene(Scenes.TitleMenu);
+        Core.addScene(Scenes.SettingsMenu);
         Core.addScene(Scenes.Game);
+        Core.addScene(Scenes.PostGame);
 
         for (let sprite of spriteData) {
             Gfx.Sprite.CreateAndStore(sprite);

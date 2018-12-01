@@ -62,7 +62,7 @@ namespace Scenes {
             }, () => {
                 player["movingUp"].value = false;
             });
-            Input.bindControl("ACTION", () => { Core.popScene(); });
+            Input.bindControl("ACTION", () => { Core.pushScene("PostGame"); });
             for (let x = 0; x < 64; x++) {
                 for (let y = 0; y < 36; y++) {
                     if (x === 63 || x === 0 || y === 35) {

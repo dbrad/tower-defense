@@ -5,7 +5,7 @@
 namespace Engine {
     export interface State {
         name: string;
-        transitionIn(): void;
+        transitionIn(...args: any[]): void;
         transitionOut(): void;
     }
 
@@ -31,7 +31,7 @@ namespace Engine {
             return this._stateStack[this._stateStack.length - 1];
         }
 
-        push(stateName: string): void {
+        push(stateName: string, ...args: any[]): void {
             if (this.current && this.current.transitionOut) {
                 this.current.transitionOut();
             }
@@ -39,10 +39,10 @@ namespace Engine {
             this._stateStack.push(this._stateDictionary[stateName]);
 
             if (this.current && this.current.transitionIn) {
-                this.current.transitionIn();
+                this.current.transitionIn(args);
             }
         }
-        pop(): State {
+        pop(...args: any[]): State {
             if (this.current && this.current.transitionOut) {
                 this.current.transitionOut();
             }
@@ -50,7 +50,7 @@ namespace Engine {
             var result = this._stateStack.pop();
 
             if (this.current && this.current.transitionIn) {
-                this.current.transitionIn();
+                this.current.transitionIn(args);
             }
             return result;
         }

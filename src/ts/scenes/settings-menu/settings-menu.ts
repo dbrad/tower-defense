@@ -3,7 +3,6 @@
 /// <reference path="../../engine/assets.ts" />
 /// <reference path="../../engine/graphics.ts" />
 /// <reference path="../../engine/input.ts" />
-/// <reference path="../../systems/save-manager.ts" />
 
 namespace Scenes {
     import E = Engine;
@@ -16,31 +15,16 @@ namespace Scenes {
     let sel = 0;
     let options: string[];
 
-    export let TitleMenu: E.Scene = {
-        name: "TitleMenu",
+    export let SettingsMenu: E.Scene = {
+        name: "SettingsMenu",
         transitionIn() {
-            
-            if (SaveManager.saveExists()) {
-                options = ["Continue", "New Game", "Settings"];
-            } else {
-                options = ["New Game", "Settings"];
-            }
-
+            options = ["Back"];
             Input.bindControl("DOWN", () => { sel += 1; if (sel > options.length - 1) sel = 0; });
             Input.bindControl("UP", () => { sel -= 1; if (sel < 0) sel = options.length - 1; });
             Input.bindControl("ACTION", () => {
                 switch (options[sel]) {
-                    case "Continue":
-                        SaveManager.load();
-                        Core.pushScene("Game");
-                        break;
-                    case "New Game":
-                        SaveManager.newGame();
-                        Core.pushScene("Game");
-                        break;
-                    case "Settings":
-                        Core.pushScene("SettingsMenu");
-                        break;
+                    case "Back":
+                        Core.popScene();
                 }
             });
         },
@@ -55,24 +39,22 @@ namespace Scenes {
         render(gl: GL.Renderer, now: number, delta: number): void {
             let s: Assets.Texture;
 
-            gl.col = 0xFFFF0000;
+            gl.col = 0xFF0000FF;
             Gfx.NinePatch.draw(gl, Gfx.NinePatchStore["dialog"], 0, 0, 32, 18);
 
             gl.col = 0xFFFFFFFF;
             let hw = ~~(Core.WIDTH / 2);
             let hh = ~~(Core.HEIGHT / 2);
 
-            Gfx.Text.draw(gl, "Tower Defense", 16, 16, Gfx.Text.Alignment.LEFT);
-
             options.forEach((value, index, array) => {
-                Gfx.Text.draw(gl, value, 32, hh + (16 * index), Gfx.Text.Alignment.LEFT);
+                Gfx.Text.draw(gl, value, hw - 16, hh + (16 * index), Gfx.Text.Alignment.LEFT);
             });
 
             Gfx.Texture.draw({
                 renderer: gl,
                 texture: Assets.TextureStore["guy_stand"],
                 position: {
-                    x: 16,
+                    x: hw - 32,
                     y: hh - 2 + (16 * sel)
                 }
             });

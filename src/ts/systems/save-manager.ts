@@ -21,6 +21,11 @@ namespace SaveManager {
         _storage.setItem("save", JSON.stringify(Game.gameState));
     }
 
+    export function saveExists(): boolean {
+        var gameStateString: string = _storage.getItem("save");
+        return (gameStateString != null && gameStateString != "");
+    }
+
     export function load(): void {
         var gameStateString: string = _storage.getItem("save");
         Game.gameState = JSON.parse(gameStateString);

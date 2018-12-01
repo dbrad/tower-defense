@@ -79,6 +79,8 @@ namespace Game {
 
         Core.init(document.getElementById("canvas") as HTMLCanvasElement);
 
+        SaveManager.setStorage(window.localStorage);
+
         // Defining and binding Controls
         Input.Controls["UP"] = [38, 87];
         Input.Controls["DOWN"] = [40, 83];
