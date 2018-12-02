@@ -53,6 +53,12 @@ namespace Engine {
             delete _bindings[key];
         }
 
+        export function unbindAll() {
+            for (let key in _bindings) {
+                delete _bindings[key];
+            }
+        }
+
         export function bindControl(control: string, keyDown: Function, keyUp: Function = () => { }): void {
             //@ifdef DEBUG
             DEBUG.assert(Controls[control] != null, `Control "${control}" is not defined.`);

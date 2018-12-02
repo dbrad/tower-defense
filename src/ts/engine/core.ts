@@ -59,8 +59,8 @@ namespace Engine {
             _scenes.register(scene);
         }
 
-        export function pushScene(name: string): void {
-            _scenes.push(name);
+        export function pushScene(name: string, ...args: any[]): void {
+            _scenes.push(name, ...args);
         }
 
         export function popScene(): void {
@@ -89,18 +89,25 @@ namespace Engine {
 
         let _previous: number;
         function loop(now: number): void {
-            let delta = now - _previous;
-            _previous = now;
-            // @ifdef DEBUG
-            Stats.tick(delta);
-            // @endif
-            update(now, delta);
-            render(now, delta);
-            requestAnimationFrame(loop);
+            if (running) {
+                let delta = now - _previous;
+                _previous = now;
+                // @ifdef DEBUG
+                Stats.tick(delta);
+                // @endif
+                if (paused) {
+                    update(now, delta);
+                }
+                render(now, delta);
+                requestAnimationFrame(loop);
+            }
         }
 
         /* ------------------------------------------------------------------------- */
 
+        let loopHandle: number;
+        let paused: boolean = false;
+        let running: boolean = false;
         export function init(glCanvas: HTMLCanvasElement): void {
             _glCanvas = glCanvas;
             _gl = GL.Renderer(_glCanvas);
@@ -113,7 +120,21 @@ namespace Engine {
         export function start(): void {
             _previous = performance.now();
             _gl.bkg(25, 25, 25);
-            requestAnimationFrame(loop);
+            running = true;
+            loopHandle = requestAnimationFrame(loop);
+        }
+
+        export function stop(): void {
+            running = false;
+            cancelAnimationFrame(loopHandle);
+        }
+
+        export function pause(): void {
+            paused = true;
+        }
+
+        export function unpause(): void {
+            paused = false;
         }
     }
 }

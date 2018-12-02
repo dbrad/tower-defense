@@ -7,6 +7,10 @@
 /// <reference path="scenes/post-game/post-game.ts" />
 /// <reference path="engine/util.ts" />
 
+// @ifdef
+/// <reference path="scenes/debug/debug.ts" />
+// @endif
+
 namespace Game {
     import Core = Engine.Core;
     import Gfx = Engine.Graphics;
@@ -14,32 +18,32 @@ namespace Game {
 
     //#region Sprite Data
     let spriteData: Gfx.SpriteDef[] = [
-    {
-        name: "cursor",
-        animations: {
-            "DEFAULT": [{
-                texture: "cursor",
-                duration: 0
-            }],
-            "blink": [{
-                texture: "cursor_light",
-                duration: 250
-            },
-            {
-                texture: "cursor",
-                duration: 250
-            },
-            {
-                texture: "cursor_dark",
-                duration: 250
-            },
-            {
-                texture: "cursor",
-                duration: 250
+        {
+            name: "cursor",
+            animations: {
+                "DEFAULT": [{
+                    texture: "cursor",
+                    duration: 0
+                }],
+                "blink": [{
+                    texture: "cursor_light",
+                    duration: 250
+                },
+                {
+                    texture: "cursor",
+                    duration: 250
+                },
+                {
+                    texture: "cursor_dark",
+                    duration: 250
+                },
+                {
+                    texture: "cursor",
+                    duration: 250
+                }
+                ]
             }
-            ]
         }
-    }
     ];
     //#endregion
     export interface GameState {
@@ -49,6 +53,9 @@ namespace Game {
     export let gameState: GameState = null;
 
     export function setup(): void {
+        // @ifdef DEBUG
+        Core.addScene(Scenes.Debug);
+        // @endif
         Core.addScene(Scenes.TitleMenu);
         Core.addScene(Scenes.SettingsMenu);
         Core.addScene(Scenes.Game);

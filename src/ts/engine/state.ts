@@ -39,7 +39,7 @@ namespace Engine {
             this._stateStack.push(this._stateDictionary[stateName]);
 
             if (this.current && this.current.transitionIn) {
-                this.current.transitionIn(args);
+                this.current.transitionIn(...args);
             }
         }
         pop(...args: any[]): State {
