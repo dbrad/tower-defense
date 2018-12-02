@@ -9,8 +9,6 @@ namespace Engine {
         }
 
         export namespace Component {
-            export let Collections: { [key: string]: Entity[] } = {};
-
             export class Position implements Component {
                 name: string;
                 active: boolean;
@@ -57,18 +55,31 @@ namespace Engine {
             [index: string]: any;
             private static __id: number = 0;
             private _components: { [key: string]: Component } = {};
+            private _manager: Manager;
             public id: number;
-            constructor() {
+            constructor(manager: Manager) {
                 this.id = Entity.__id++;
+                this._manager = manager;
             }
 
             public addComponent(component: Component): void {
                 this._components[component.name] = component;
                 this[component.name] = component;
-                if (Component.Collections[component.name] == null) {
-                    Component.Collections[component.name] = [];
+                if (this._manager.collections[component.name] == null) {
+                    this._manager.collections[component.name] = [];
                 }
-                Component.Collections[component.name].push(this);
+                this._manager.collections[component.name].push(this);
+            }
+        }
+
+        export class Manager {
+            public collections: { [key: string]: Entity[] } = {};
+            public entities: Entity[] = [];
+
+            public addEntity(): Entity {
+                let entity: Entity = new Entity(this);
+                this.entities.push(entity);
+                return entity;
             }
         }
     }

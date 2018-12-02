@@ -17,9 +17,10 @@ namespace Scenes {
     import Gfx = E.Graphics;
     import Assets = E.Assets;
 
-    let entities: ECS.Entity[] = [];
-    let player: ECS.Entity = new ECS.Entity();
-    entities.push(player);
+    let ecsManager: ECS.Manager = new ECS.Manager();
+    let player = ecsManager.addEntity();
+
+    player.addComponent(new Component.Tag("type", "player"));
     player.addComponent(new Component.Position("tilePos", { x: 5, y: 5 }));
     player.addComponent(new Component.Position("renderPos", { x: 5 * 8, y: 5 * 8 }));
     player.addComponent(new Component.Position("targetTile", { x: 5, y: 5 }));
@@ -34,14 +35,27 @@ namespace Scenes {
         tileSize: 8,
         tiles: []
     };
-    const CameraGap: number = 8 * 6;
 
+    const CameraGap: number = 8 * 6;
     let camera: Engine.Camera =
         Engine.Camera.create({ x: 0, y: 0 }, { x: 24 * 8, y: 18 * 8 });
 
     export let Game: E.Scene = {
         name: "Game",
         transitionIn() {
+
+            for (let x = 0; x < 64; x++) {
+                for (let y = 0; y < 36; y++) {
+                    if (x === 63 || x === 0 || y === 35) {
+                        Engine.TileMap.addTile(tileMap, Engine.TileStorage["wall"], { x, y });
+                    } else if (y === 0) {
+                        Engine.TileMap.addTile(tileMap, Engine.TileStorage["north_wall"], { x, y });
+                    } else {
+                        Engine.TileMap.addTile(tileMap, Engine.TileStorage["floor"], { x, y });
+                    }
+                }
+            }
+
             Input.bindControl("RIGHT", () => {
                 player["movingRight"].value = true;
             }, () => {
@@ -63,17 +77,6 @@ namespace Scenes {
                 player["movingUp"].value = false;
             });
             Input.bindControl("ACTION", () => { Core.pushScene("PostGame"); });
-            for (let x = 0; x < 64; x++) {
-                for (let y = 0; y < 36; y++) {
-                    if (x === 63 || x === 0 || y === 35) {
-                        Engine.TileMap.addTile(tileMap, Engine.TileStorage["wall"], { x, y });
-                    } else if (y === 0) {
-                        Engine.TileMap.addTile(tileMap, Engine.TileStorage["north_wall"], { x, y });
-                    } else {
-                        Engine.TileMap.addTile(tileMap, Engine.TileStorage["floor"], { x, y });
-                    }
-                }
-            }
         },
         transitionOut() {
             Input.unbindControl("RIGHT");

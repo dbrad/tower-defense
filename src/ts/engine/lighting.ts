@@ -1,3 +1,5 @@
+/// <reference path="tilemap.ts" />
+
 namespace Engine {
 
     export interface Light {
