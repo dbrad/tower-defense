@@ -13,45 +13,28 @@ namespace Game {
     import Assets = Engine.Assets;
 
     //#region Sprite Data
-    let spriteData: Gfx.SpriteDef[] = [{
-        name: "dude01",
-        animations: {
-            "DEFAULT": [{
-                texture: "guy_stand",
-                duration: 0
-            }],
-            "walk": [{
-                texture: "guy_01",
-                duration: 250
-            },
-            {
-                texture: "guy_02",
-                duration: 250
-            },
-            ]
-        }
-    },
+    let spriteData: Gfx.SpriteDef[] = [
     {
-        name: "dude02",
+        name: "cursor",
         animations: {
             "DEFAULT": [{
-                texture: "guy_stand",
+                texture: "cursor",
                 duration: 0
             }],
-            "walk": [{
-                texture: "guy_02",
+            "blink": [{
+                texture: "cursor_light",
                 duration: 250
             },
             {
-                texture: "guy_stand",
+                texture: "cursor",
                 duration: 250
             },
             {
-                texture: "guy_01",
+                texture: "cursor_dark",
                 duration: 250
             },
             {
-                texture: "guy_stand",
+                texture: "cursor",
                 duration: 250
             }
             ]
@@ -97,8 +80,7 @@ namespace Game {
             false
         );
 
-        Gfx.SpriteStore["dude01"].play("walk", true);
-        Gfx.SpriteStore["dude02"].play("walk", true);
+        Gfx.SpriteStore["cursor"].play("blink", true);
 
         let dialog: Gfx.NinePatch = {
             tl: Assets.TextureStore["dialog_tl"], tc: Assets.TextureStore["dialog_t"], tr: Assets.TextureStore["dialog_tr"],

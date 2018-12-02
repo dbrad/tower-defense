@@ -94,7 +94,7 @@ namespace Scenes {
             let camera = self.fetch<E.Camera>("camera");
             let cameraGap = self.fetch<number>("cameraGap");
 
-            Gfx.SpriteStore["dude02"].update(now, delta);
+            Gfx.SpriteStore["cursor"].update(now, delta);
 
             System.handlePlayerInput(player);
             if (player["moving"].value === true) {
@@ -128,7 +128,7 @@ namespace Scenes {
             gl.col = 0xFFFFFFFF;
             Gfx.Texture.draw({
                 renderer: gl,
-                texture: Gfx.SpriteStore["dude02"].currentFrame.texture,
+                texture: Gfx.SpriteStore["cursor"].currentFrame.texture,
                 position: V2.sub(player["renderPos"].value, camera.position)
             });
 

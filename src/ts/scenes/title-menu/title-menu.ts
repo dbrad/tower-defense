@@ -70,7 +70,7 @@ namespace Scenes {
 
             Gfx.Texture.draw({
                 renderer: gl,
-                texture: Assets.TextureStore["guy_stand"],
+                texture: Assets.TextureStore["cursor"],
                 position: {
                     x: 16,
                     y: hh - 2 + (16 * sel)

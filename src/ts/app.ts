@@ -29,7 +29,7 @@ namespace Game {
             sWidth: 8,
             sHeight: 8,
             textures: [
-                ['brick', 'guy_stand', 'guy_01', 'guy_02'],
+                ['brick', 'cursor', 'cursor_dark', 'cursor_light'],
                 ['dialog_tl', 'dialog_t', 'dialog_tr', 'blank03'],
                 ['dialog_ml', 'dialog_m', 'dialog_mr', 'blank04'],
                 ['dialog_bl', 'dialog_b', 'dialog_br', 'blank05']
@@ -44,20 +44,6 @@ namespace Game {
                     y: 0,
                     width: 32,
                     height: 32
-                },
-                {
-                    name: "test2",
-                    x: 16,
-                    y: 32,
-                    width: 16,
-                    height: 32
-                },
-                {
-                    name: "test3",
-                    x: 32,
-                    y: 0,
-                    width: 64,
-                    height: 64
                 }
             ]
         },
