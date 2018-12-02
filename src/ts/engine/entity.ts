@@ -24,8 +24,8 @@ namespace Engine {
                 name: string;
                 active: boolean;
                 value: string;
-                constructor(name: string, tag: string) {
-                    this.name = name;
+                constructor(tag: string) {
+                    this.name = tag;
                     this.value = tag;
                 }
             }
@@ -69,6 +69,15 @@ namespace Engine {
                     this._manager.collections[component.name] = [];
                 }
                 this._manager.collections[component.name].push(this);
+                this._manager.collections[component.name].sort(
+                    (a: Entity, b: Entity) => {
+                        if (a.id < b.id) {
+                            return -1;
+                        } else if (a.id > b.id) {
+                            return 1;
+                        }
+                        return 0;
+                    });
             }
         }
 
@@ -80,6 +89,14 @@ namespace Engine {
                 let entity: Entity = new Entity(this);
                 this.entities.push(entity);
                 return entity;
+            }
+
+            public getAll(name: string): Entity[] {
+                return this.collections[name];
+            }
+
+            public getFirst(name: string): Entity {
+                return this.collections[name][0];
             }
         }
     }

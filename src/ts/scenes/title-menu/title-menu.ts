@@ -16,7 +16,7 @@ namespace Scenes {
     let sel = 0;
     let options: string[];
 
-    export let TitleMenu: E.Scene = {
+    export let TitleMenu: E.Scene = new E.Scene({
         name: "TitleMenu",
         transitionIn() {
             
@@ -77,5 +77,5 @@ namespace Scenes {
                 }
             });
         }
-    };
+    });
 }

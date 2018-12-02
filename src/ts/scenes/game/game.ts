@@ -17,32 +17,33 @@ namespace Scenes {
     import Gfx = E.Graphics;
     import Assets = E.Assets;
 
-    let ecsManager: ECS.Manager = new ECS.Manager();
-    let player = ecsManager.addEntity();
-
-    player.addComponent(new Component.Tag("type", "player"));
-    player.addComponent(new Component.Position("tilePos", { x: 5, y: 5 }));
-    player.addComponent(new Component.Position("renderPos", { x: 5 * 8, y: 5 * 8 }));
-    player.addComponent(new Component.Position("targetTile", { x: 5, y: 5 }));
-    player.addComponent(new Component.Flag("moving", false));
-    player.addComponent(new Component.Flag("movingLeft", false));
-    player.addComponent(new Component.Flag("movingRight", false));
-    player.addComponent(new Component.Flag("movingUp", false));
-    player.addComponent(new Component.Flag("movingDown", false));
-
-    let tileMap: Engine.TileMap = {
-        mapSize: { x: 64, y: 36 },
-        tileSize: 8,
-        tiles: []
-    };
-
-    const CameraGap: number = 8 * 6;
-    let camera: Engine.Camera =
-        Engine.Camera.create({ x: 0, y: 0 }, { x: 24 * 8, y: 18 * 8 });
-
-    export let Game: E.Scene = {
+    export let Game: E.Scene = new E.Scene({
         name: "Game",
         transitionIn() {
+            let self: E.Scene = this as E.Scene;
+
+            self.attach<number>("cameraGap", 8 * 6);
+            self.attach<Engine.Camera>("camera", Engine.Camera.create({ x: 0, y: 0 }, { x: 24 * 8, y: 18 * 8 }));
+
+            let tileMap =
+                self.attach<E.TileMap>("tileMap", {
+                    mapSize: { x: 64, y: 36 },
+                    tileSize: 8,
+                    tiles: []
+                });
+
+            let ecsManager = self.attach<ECS.Manager>("ecsManager", new ECS.Manager());
+            let player = ecsManager.addEntity();
+
+            player.addComponent(new Component.Tag("player"));
+            player.addComponent(new Component.Position("tilePos", { x: 5, y: 5 }));
+            player.addComponent(new Component.Position("renderPos", { x: 5 * 8, y: 5 * 8 }));
+            player.addComponent(new Component.Position("targetTile", { x: 5, y: 5 }));
+            player.addComponent(new Component.Flag("moving", false));
+            player.addComponent(new Component.Flag("movingLeft", false));
+            player.addComponent(new Component.Flag("movingRight", false));
+            player.addComponent(new Component.Flag("movingUp", false));
+            player.addComponent(new Component.Flag("movingDown", false));
 
             for (let x = 0; x < 64; x++) {
                 for (let y = 0; y < 36; y++) {
@@ -86,8 +87,15 @@ namespace Scenes {
             Input.unbindControl("ACTION");
         },
         update(now: number, delta: number): void {
-            Gfx.SpriteStore["dude01"].update(now, delta);
+            let self: E.Scene = this as E.Scene;
+            let ecs = self.fetch<ECS.Manager>("ecsManager");
+            let player = ecs.getFirst("player");
+            let tileMap = self.fetch<E.TileMap>("tileMap");
+            let camera = self.fetch<E.Camera>("camera");
+            let cameraGap = self.fetch<number>("cameraGap");
+
             Gfx.SpriteStore["dude02"].update(now, delta);
+
             System.handlePlayerInput(player);
             if (player["moving"].value === true) {
                 System.handleCollision(player, tileMap);
@@ -98,7 +106,7 @@ namespace Scenes {
             if (!camera.moving) {
                 let gapX = player["renderPos"].value.x - (camera.position.x + ~~(camera.size.x / 2));
                 let gapY = player["renderPos"].value.y - (camera.position.y + ~~(camera.size.y / 2));
-                if (gapX >= CameraGap || gapX <= -CameraGap || gapY >= CameraGap || gapY <= -CameraGap) {
+                if (gapX >= cameraGap || gapX <= -cameraGap || gapY >= cameraGap || gapY <= -cameraGap) {
                     let targetX = player["renderPos"].value.x - ~~(camera.size.x / 2);
                     let targetY = player["renderPos"].value.y - ~~(camera.size.y / 2);
                     Engine.Camera.move(camera, { x: targetX, y: targetY }, now, 1500, Easing.outQuart);
@@ -107,8 +115,13 @@ namespace Scenes {
             Engine.Camera.update(camera, now);
         },
         render(gl: GL.Renderer, now: number, delta: number): void {
+            let self: E.Scene = this as E.Scene;
+            let ecs = self.fetch<ECS.Manager>("ecsManager");
+            let player = ecs.getFirst("player");
+            let tileMap = self.fetch<E.TileMap>("tileMap");
+            let camera = self.fetch<E.Camera>("camera");
+
             gl.bkg(0, 0, 0);
-            let s: Assets.Texture;
 
             Gfx.TileMap.draw(gl, camera, tileMap);
 
@@ -122,5 +135,5 @@ namespace Scenes {
             gl.col = 0xFFFF8888;
             Gfx.NinePatch.draw(gl, Gfx.NinePatchStore["dialog"], 24, 0, 8, 18);
         }
-    };
+    });
 }

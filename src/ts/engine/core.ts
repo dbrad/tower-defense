@@ -6,9 +6,42 @@
 // @endif
 
 namespace Engine {
-    export interface Scene extends State {
-        update(now: number, delta: number): void;
-        render(gl: GL.Renderer, now: number, delta: number): void;
+    export class Scene implements State {
+        public name: string;
+        public transitionIn: (...args: any[]) => void;
+        public transitionOut: () => void;
+        public update: (now: number, delta: number) => void;
+        public render: (gl: GL.Renderer, now: number, delta: number) => void;
+
+        constructor(definition: Scene.Definition) {
+            this.transitionIn = definition.transitionIn;
+            this.transitionOut = () => {
+                this._storage = {};
+                definition.transitionOut();
+            };
+            this.update = definition.update;
+            this.render = definition.render;
+            this.name = definition.name;
+        }
+
+        protected _storage: { [key: string]: any } = {};
+        public attach<T>(name: string, object: T): T {
+            //@ifdef DEBUG
+            DEBUG.assert(this._storage[name] == null, `${name} is already attached.`);
+            //@endif
+            this._storage[name] = object;
+            return object;
+        }
+        public fetch<T>(name: string): T {
+            return this._storage[name] as T;
+        }
+    }
+
+    export namespace Scene {
+        export interface Definition extends State {
+            update(now: number, delta: number): void;
+            render(gl: GL.Renderer, now: number, delta: number): void;
+        }
     }
 
     export namespace Core {

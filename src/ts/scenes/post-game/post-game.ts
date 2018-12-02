@@ -12,7 +12,7 @@ namespace Scenes {
     import Assets = E.Assets;
     import GL = E.GL;
 
-    export let PostGame: E.Scene = {
+    export let PostGame: E.Scene = new E.Scene({
         name: "PostGame",
         transitionIn() {
             Input.bindControl("ACTION", () => {
@@ -38,5 +38,5 @@ namespace Scenes {
 
             Gfx.Text.draw(gl, "Winner is you.", hw, hh, Gfx.Text.Alignment.CENTER);
         }
-    };
+    });
 }

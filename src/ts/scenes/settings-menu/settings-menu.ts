@@ -15,7 +15,7 @@ namespace Scenes {
     let sel = 0;
     let options: string[];
 
-    export let SettingsMenu: E.Scene = {
+    export let SettingsMenu: E.Scene = new E.Scene({
         name: "SettingsMenu",
         transitionIn() {
             options = ["Back"];
@@ -59,5 +59,5 @@ namespace Scenes {
                 }
             });
         }
-    };
+    });
 }
