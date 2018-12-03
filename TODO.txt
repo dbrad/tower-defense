@@ -1,11 +1,5 @@
-Create instancable EntityManager
-    - Entity Collections by components
-    - Master entity Collections
-    - Named entity retreival?
-    - Sort entities by Tag via collections?
-    
-
-Create concept of attaching objects to scenes so nothing needs to live in the namespace or globally that belongs to a scene?
-
-Global data should live in the Game.gameState object.
-
+Add call to render a rectangle to the screen.
+ - look into ways of rendering without a texture?
+ - just set the color directly to a color I think...
+ - maybe needs a new call in the gl helper?
+Use that call in pause blocker.

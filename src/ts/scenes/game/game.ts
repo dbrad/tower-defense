@@ -33,7 +33,7 @@ namespace Scenes {
                 });
 
             let ecsManager = self.attach<ECS.Manager>("ecsManager", new ECS.Manager());
-            
+
             let player = ecsManager.addEntity();
             {
                 player.addComponent(new Component.Tag("player"));
@@ -68,19 +68,19 @@ namespace Scenes {
                 player.getComponent<Component.Flag>("movingRight").value = false;
             });
             Input.bindControl("LEFT", () => {
-                 player.getComponent<Component.Flag>("movingLeft").value = true;
+                player.getComponent<Component.Flag>("movingLeft").value = true;
             }, () => {
-                 player.getComponent<Component.Flag>("movingLeft").value = false;
+                player.getComponent<Component.Flag>("movingLeft").value = false;
             });
             Input.bindControl("DOWN", () => {
-                 player.getComponent<Component.Flag>("movingDown").value = true;
+                player.getComponent<Component.Flag>("movingDown").value = true;
             }, () => {
-                 player.getComponent<Component.Flag>("movingDown").value = false;
+                player.getComponent<Component.Flag>("movingDown").value = false;
             });
             Input.bindControl("UP", () => {
-                 player.getComponent<Component.Flag>("movingUp").value = true;
+                player.getComponent<Component.Flag>("movingUp").value = true;
             }, () => {
-                 player.getComponent<Component.Flag>("movingUp").value = false;
+                player.getComponent<Component.Flag>("movingUp").value = false;
             });
             Input.bindControl("ACTION", () => { Core.pushScene("PostGame"); });
         },
@@ -136,12 +136,12 @@ namespace Scenes {
 
             gl.col = 0xFFFFFFFF;
             let sprite = player.getComponent<Component.Object<Gfx.Sprite>>("sprite").value;
-            let renderPos = player.getComponent<Component.Position>("renderPos");
+            let renderPos = player.getComponent<Component.Position>("renderPos").value;
 
             Gfx.Texture.draw({
                 renderer: gl,
                 texture: sprite.currentFrame.texture,
-                position: V2.sub(renderPos.value, camera.position)
+                position: V2.sub(renderPos, camera.position)
             });
 
             gl.col = 0xFFFF8888;

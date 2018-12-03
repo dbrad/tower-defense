@@ -14,6 +14,7 @@ namespace Engine {
         let _bindings: KeyBind[] = [];
         let _isDown: boolean[] = [];
         let _isUp: boolean[] = [];
+        let disabled: boolean = false;
 
         for (let i: number = 0; i < 256; i++) {
             _isUp[i] = true;
@@ -23,26 +24,47 @@ namespace Engine {
         window.onkeyup = keyUp;
 
         export function keyDown(event: KeyboardEvent): void {
-            let keyCode: number = event.which;
-            if (_isUp[keyCode]) {
-                // @ifdef DEBUG
-                DEBUG.log(keyCode.toString());
-                // @endif
-                if (_bindings[keyCode]) {
-                    _bindings[keyCode].keyDown();
+            if (!disabled) {
+                let keyCode: number = event.which;
+                if (_isUp[keyCode]) {
+                    // @ifdef DEBUG
+                    DEBUG.log(keyCode.toString());
+                    // @endif
+                    if (_bindings[keyCode]) {
+                        _bindings[keyCode].keyDown();
+                    }
                 }
+                _isUp[keyCode] = false;
+                _isDown[keyCode] = true;
             }
-            _isUp[keyCode] = false;
-            _isDown[keyCode] = true;
         }
 
         export function keyUp(event: KeyboardEvent): void {
-            let keyCode: number = event.which;
-            if (_bindings[keyCode]) {
-                _bindings[keyCode].keyUp();
+            if (!disabled) {
+                let keyCode: number = event.which;
+                if (_bindings[keyCode]) {
+                    _bindings[keyCode].keyUp();
+                }
+                _isDown[keyCode] = false;
+                _isUp[keyCode] = true;
             }
-            _isDown[keyCode] = false;
-            _isUp[keyCode] = true;
+        }
+
+        export function disable() {
+            disabled = true;
+            _isDown.forEach((value, index, array) => {
+                if(value) {
+                    _bindings[index].keyUp();
+                }
+                array[index] = false;
+            });
+            _isUp.forEach((value, index, array) => {
+                array[index] = true;
+            });
+        }
+
+        export function enable() {
+            disabled = false;
         }
 
         export function bindKey(key: number, keyDown: Function, keyUp: Function = () => { }): void {

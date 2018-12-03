@@ -84,6 +84,12 @@ namespace Game {
             (): void => {
                 window.onresize = onResize;
                 onResize();
+                window.onblur = () => {
+                    Core.pause();
+                };
+                window.onfocus = () => {
+                    Core.unpause();
+                }
                 Core.start();
                 Game.setup();
             });

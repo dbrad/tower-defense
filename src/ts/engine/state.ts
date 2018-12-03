@@ -50,7 +50,7 @@ namespace Engine {
             var result = this._stateStack.pop();
 
             if (this.current && this.current.transitionIn) {
-                this.current.transitionIn(args);
+                this.current.transitionIn(...args);
             }
             return result;
         }

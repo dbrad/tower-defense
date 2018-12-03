@@ -7,7 +7,7 @@
 /// <reference path="scenes/post-game/post-game.ts" />
 /// <reference path="engine/util.ts" />
 
-// @ifdef
+// @ifdef DEBUG
 /// <reference path="scenes/debug/debug.ts" />
 // @endif
 

@@ -1,5 +1,7 @@
 /// <reference path="state.ts" />
 /// <reference path="gl.ts" />
+/// <reference path="graphics.ts" />
+/// <reference path="input.ts" />
 // @ifdef DEBUG
 /// <reference path="debug.ts" />
 /// <reference path="stats.ts" />
@@ -79,8 +81,16 @@ namespace Engine {
         function render(now: number, delta: number): void {
             let scene = _scenes.current as Scene;
             _gl.cls();
-            if (scene) {
-                scene.render(_gl, now, delta);
+            if (!paused) {
+                if (scene) {
+                    scene.render(_gl, now, delta);
+                }
+            } else {
+                let hw = ~~(WIDTH / 2);
+                let hh = ~~(HEIGHT / 2);
+                _gl.col = 0xFFFFFFFF;
+                Graphics.Text.draw(_gl, "game paused", hw, hh - 8, Graphics.Text.Alignment.CENTER);
+                Graphics.Text.draw(_gl, "click here to resume", hw, hh + 8, Graphics.Text.Alignment.CENTER);
             }
             _gl.flush();
         }
@@ -95,7 +105,7 @@ namespace Engine {
                 // @ifdef DEBUG
                 Stats.tick(delta);
                 // @endif
-                if (paused) {
+                if (!paused) {
                     update(now, delta);
                 }
                 render(now, delta);
@@ -119,7 +129,7 @@ namespace Engine {
 
         export function start(): void {
             _previous = performance.now();
-            _gl.bkg(25, 25, 25);
+            _gl.bkg(0, 0, 0);
             running = true;
             loopHandle = requestAnimationFrame(loop);
         }
@@ -131,10 +141,12 @@ namespace Engine {
 
         export function pause(): void {
             paused = true;
+            Input.disable();
         }
 
         export function unpause(): void {
             paused = false;
+            Input.enable();
         }
     }
 }
