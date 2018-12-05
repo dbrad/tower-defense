@@ -9,16 +9,16 @@ namespace Engine {
         transitionOut(): void;
     }
 
-    export class StateMachine {
-        private _stateDictionary: { [key: string]: State; };
-        private _stateStack: State[];
+    export class StateMachine<T extends State> {
+        private _stateDictionary: { [key: string]: T; };
+        private _stateStack: T[];
 
         constructor() {
             this._stateDictionary = {};
             this._stateStack = [];
         }
 
-        register(state: State): void {
+        register(state: T): void {
             // @ifdef DEBUG
             DEBUG.assert(state.transitionIn != null, `State needs to have a 'transitionIn' method.`);
             DEBUG.assert(state.transitionOut != null, `State needs to have a 'transitionOut' method.`);
@@ -27,7 +27,7 @@ namespace Engine {
             this._stateDictionary[state.name] = state;
         }
 
-        get current(): State {
+        get current(): T {
             return this._stateStack[this._stateStack.length - 1];
         }
 
@@ -42,7 +42,7 @@ namespace Engine {
                 this.current.transitionIn(...args);
             }
         }
-        pop(...args: any[]): State {
+        pop(...args: any[]): T {
             if (this.current && this.current.transitionOut) {
                 this.current.transitionOut();
             }

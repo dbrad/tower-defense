@@ -1,5 +1,68 @@
-Add call to render a rectangle to the screen.
- - look into ways of rendering without a texture?
- - just set the color directly to a color I think...
- - maybe needs a new call in the gl helper?
-Use that call in pause blocker.
+Local state of a scene does not persist between transitions. (Setup in transition in, torn down in transition out)
+All persisant state should be in an elevated object / structure.
+Scene should be able to be thrown away and recreated without effecting gameplay.
+
+do i want subscenes/states to have update & render, or handle everything as an entity, and let the scene handle the update and render...
+if I add entities to the parent ecs collection, I will need to clean them up on transistion out... 
+if I give the sub scene its own collection I could concat the 2 collections prior to system processing a given type...
+if the sub scenes have update and render when would I call them? vs the calls in the parent
+
+if everything is entites... I need a concept of a text entity.. and 9patch entity...
+a render system for those type calling my engine code might work for that...
+
+render order is...
+    TileMap
+    9Patch entities
+    Text Entities
+    All other entites by sort order?
+    ...
+    or give each entity a sort order...
+    should a tilemap be jammed in an entity with a sort order?? maybe
+    system that takes all "renderable" entities, sorts on draw order, calls appropriate render call based on tag?
+
+    GetAllRenderable()
+    SortList()
+    Split by filtering on tag...
+        RenderForTag()
+
+Maybe make a entities collection that I can filter on further... maybe use built in js filters and such...
+
+Game scene states
+- Build
+    - Sub-states
+        - Move Mode
+        - Build Menu
+        - Upgrade Menu
+    - Can move cursor around freely
+    - Sidebar should show info of current selection under cursor
+    - press action to open menu in sidebar
+        = wall
+        - tower
+        - cancel (also esc key)
+        - next wave
+    - action again to drill into list on tower, to build wall, close menu, or start defend state
+        - Uses a tower point for tower
+        - wall point for wall
+    - building anything will:
+        - check for the right point type vs cost
+        - do an a* check to ensure each pathing point can reach the next
+            - if this passes, the tower/wall will be build
+    - Defend state will start when all points are spent, or when the player picks "Next Wave" from menu
+        - Go to substate Move Mode
+        - Go to game state Defend
+
+- Defend
+    - Can move cursor around freely
+    - Sidebar should show info of current selection under cursor
+    - sidebar also shows current enemy type in wave
+    - cannot build
+    - enemies path from point to point in order
+    - enemies dying before reaching final point award upgrade points
+    - enemies reaching last point are removed from map
+        - remove a life
+        - no upgrade points rewarded for these enemies.
+    - lives hit 0, lose, go to post-game screen as loss
+    - wave complete with > 0 live
+        - award 4 wall points and 1 tower point 
+        - go to build state again if map not complete (# of waves)
+        - go to post-game as victory if waves are complete with >0 lives

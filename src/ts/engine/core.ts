@@ -53,7 +53,7 @@ namespace Engine {
         export let WIDTH: number = 0;
         export let HEIGHT: number = 0;
 
-        let _scenes: StateMachine;
+        let _scenes: StateMachine<Scene>;
 
         /* ------------------------------------------------------------------------- */
 
@@ -122,7 +122,7 @@ namespace Engine {
             _glCanvas = glCanvas;
             _gl = GL.Renderer(_glCanvas);
 
-            _scenes = new StateMachine();
+            _scenes = new StateMachine<Scene>();
             WIDTH = _gl.canvas.width;
             HEIGHT = _gl.canvas.height;
         }

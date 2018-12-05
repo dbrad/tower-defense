@@ -114,7 +114,7 @@ namespace Engine {
             public addComponent(component: Component): void {
                 // @ifdef DEBUG
                 DEBUG.assert(this._components[component.name] == null,
-                    `Cannot add component "${component.name}" to Entity #${this.id} multiple times.`,
+                    `Cannot add component named "${component.name}" to Entity #${this.id} multiple times.`,
                     this);
                 // @endif
 

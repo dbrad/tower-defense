@@ -58,7 +58,7 @@ namespace Game {
         // @endif
         Core.addScene(Scenes.TitleMenu);
         Core.addScene(Scenes.SettingsMenu);
-        Core.addScene(Scenes.Game);
+        Core.addScene(Scenes.Game.scene);
         Core.addScene(Scenes.PostGame);
 
         for (let sprite of spriteData) {
