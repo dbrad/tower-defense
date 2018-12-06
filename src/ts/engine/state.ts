@@ -35,24 +35,33 @@ namespace Engine {
             if (this.current && this.current.transitionOut) {
                 this.current.transitionOut();
             }
+            // todo(dbrad): revert this to the old way of updating the current state here
+            // so the transitioning state has control of the update and render
+            let newState = this._stateDictionary[stateName];
 
-            this._stateStack.push(this._stateDictionary[stateName]);
-
-            if (this.current && this.current.transitionIn) {
-                this.current.transitionIn(...args);
+            if (newState && newState.transitionIn) {
+                newState.transitionIn(...args);
             }
+
+            this._stateStack.push(newState);
         }
         pop(...args: any[]): T {
             if (this.current && this.current.transitionOut) {
                 this.current.transitionOut();
             }
 
-            var result = this._stateStack.pop();
-
-            if (this.current && this.current.transitionIn) {
-                this.current.transitionIn(...args);
+            if (this._stateStack.length < 2) {
+                return null;
             }
-            return result;
+            // todo(dbrad): revert this to the old way of updating the current state here
+            // so the transitioning state has control of the update and render
+            var newState = this._stateStack[this._stateStack.length - 2];
+
+            if (newState && newState.transitionIn) {
+                newState.transitionIn(...args);
+            }
+
+            return this._stateStack.pop();
         }
     }
 }

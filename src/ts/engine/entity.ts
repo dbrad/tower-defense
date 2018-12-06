@@ -12,6 +12,8 @@ namespace Engine {
         }
 
         export namespace Component {
+            export type Collection = { [key: string]: Entity[] };
+
             export class Position implements Component {
                 name: string;
                 active: boolean;
@@ -62,6 +64,13 @@ namespace Engine {
                     this.value = object;
                 }
             }
+
+            export function coalesceValue<T extends Component, K>(component: T | null, ifNull: K): K {
+                if (component != null) {
+                    return component.value;
+                }
+                return ifNull;
+            }
         }
 
         export class Entity {
@@ -100,18 +109,10 @@ namespace Engine {
                     this._manager.collections[component.name] = [];
                 }
                 this._manager.collections[component.name].push(this);
-                this._manager.collections[component.name].sort(
-                    (a: Entity, b: Entity) => {
-                        if (a.id < b.id) {
-                            return -1;
-                        } else if (a.id > b.id) {
-                            return 1;
-                        }
-                        return 0;
-                    });
+                this._manager.emit(this, component.name, "added");
             }
 
-            public addComponent(component: Component): void {
+            public addComponent<T extends Component>(component: T): T {
                 // @ifdef DEBUG
                 DEBUG.assert(this._components[component.name] == null,
                     `Cannot add component named "${component.name}" to Entity #${this.id} multiple times.`,
@@ -122,15 +123,27 @@ namespace Engine {
                 if (this._manager != null) {
                     this.registerComponentWithManager(component);
                 }
+                return component;
             }
 
             public getComponent<T extends Component>(name: string): T {
+                if (this._components[name] == null) {
+                    return null;
+                }
                 return this._components[name] as T;
+            }
+
+            public hasComponent(name: string): boolean {
+                return (this._components[name] != null);
             }
         }
 
+        type Event = "added" | "removed";
+        type EventHandler = (entity: Entity, collection: Entity[], event: Event) => void;
+
         export class Manager {
-            public collections: { [key: string]: Entity[] } = {};
+            public collections: Component.Collection = {};
+            private _eventHandlers: { [key: string]: { [key: string]: EventHandler[] } } = {};
             public entities: Entity[] = [];
 
             public addEntity(entity?: Entity): Entity {
@@ -148,7 +161,30 @@ namespace Engine {
             }
 
             public getFirst(name: string): Entity {
+                if (this.collections[name] == null) {
+                    return null;
+                }
                 return this.collections[name][0];
+            }
+
+            public on(collectionName: string, event: Event, handler: EventHandler): void {
+                if (this._eventHandlers[collectionName] == null) {
+                    this._eventHandlers[collectionName] = {};
+                }
+                if (this._eventHandlers[collectionName][event] == null) {
+                    this._eventHandlers[collectionName][event] = [];
+                }
+                this._eventHandlers[collectionName][event].push(handler);
+            }
+
+            public emit(entity: Entity, collection: string, event: Event): void {
+                if (this._eventHandlers[collection] &&
+                    this._eventHandlers[collection][event]) {
+                    this._eventHandlers[collection][event].forEach(
+                        (handler, index, array) => {
+                            handler(entity, this.collections[collection], event);
+                        });
+                }
             }
         }
     }

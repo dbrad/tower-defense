@@ -70,14 +70,14 @@ namespace System {
 
         if (movingRight.value || movingLeft.value) {
             let tile = Engine.TileMap.getTile(tileMap, { x: targetTile.value.x, y: tilePos.value.y });
-            if (tile.hasCollision) {
+            if (tile && tile.hasCollision) {
                 movingRight.value = movingLeft.value = false;
                 targetTile.value.x = tilePos.value.x;
             }
         }
         if (movingUp.value || movingDown.value) {
             let tile = Engine.TileMap.getTile(tileMap, { x: tilePos.value.x, y: targetTile.value.y });
-            if (tile.hasCollision) {
+            if (tile && tile.hasCollision) {
                 movingUp.value = movingDown.value = false;
                 targetTile.value.y = tilePos.value.y;
             }

@@ -44,30 +44,86 @@ namespace Scenes {
                 self.attach("cameraGap", 8 * 6);
                 self.attach("camera", Engine.Camera.create({ x: 0, y: 0 }, { x: 24 * 8, y: 18 * 8 }));
 
-                let tileMap =
-                    self.attach<E.TileMap>("tileMap", {
-                        mapSize: { x: 32, y: 16 },
-                        tileSize: 8,
-                        tiles: []
+                let ecsManager = self.attach("ecsManager", new ECS.Manager());
+
+                ecsManager.on("renderable", "added",
+                    (entity, collection, event) => {
+                        collection.sort(
+                            (entityA: ECS.Entity, entityB: ECS.Entity): number => {
+                                let sortA = ECS.Component.coalesceValue(entityA.getComponent<ECS.Component.Number>("sort"), 0);
+                                let sortB = ECS.Component.coalesceValue(entityB.getComponent<ECS.Component.Number>("sort"), 0);
+                                return sortA - sortB;
+                            });
                     });
+
+                let tileMap: E.TileMap = {
+                    mapSize: { x: 32, y: 16 },
+                    tileSize: 8,
+                    tiles: []
+                };
 
                 makeMap(tileMap);
 
-                let ecsManager = self.attach("ecsManager", new ECS.Manager());
+                let tileMapEntity = ecsManager.addEntity();
+                {
+                    tileMapEntity.addComponent(new Component.Tag("renderable"));
+                    tileMapEntity.addComponent(new Component.Tag("levelMap"));
+                    tileMapEntity.addComponent(new Component.Object("tileMap", tileMap));
+                    tileMapEntity.addComponent(new Component.Number("sort", 1));
+                }
 
                 let player = ecsManager.addEntity();
                 {
                     player.addComponent(new Component.Tag("player"));
-                    player.addComponent(new Component.Position("tilePos", { x: 5, y: 5 }));
-                    player.addComponent(new Component.Position("renderPos", { x: 5 * 8, y: 5 * 8 }));
-                    player.addComponent(new Component.Position("targetTile", { x: 5, y: 5 }));
+                    player.addComponent(new Component.Tag("renderable"));
+                    let tilePos = player.addComponent(new Component.Position("tilePos", { x: 1, y: 1 }));
+                    player.addComponent(new Component.Position("renderPos", TileToPixel(tilePos.value, tileMap.tileSize)));
+                    player.addComponent(new Component.Position("targetTile", CopyV2(tilePos.value)));
                     player.addComponent(new Component.Flag("moving", false));
                     player.addComponent(new Component.Flag("movingLeft", false));
                     player.addComponent(new Component.Flag("movingRight", false));
                     player.addComponent(new Component.Flag("movingUp", false));
                     player.addComponent(new Component.Flag("movingDown", false));
                     player.addComponent(new Component.Object("sprite", Gfx.SpriteStore["cursor"]));
+                    player.addComponent(new Component.Number("sort", 2));
+                    player.addComponent(new Component.Number("colour", 0xFFFF2222));
                 }
+
+                {
+                    let doopy = ecsManager.addEntity();
+                    doopy.addComponent(new Component.Tag("renderable"));
+                    let tilePos = doopy.addComponent(new Component.Position("tilePos", { x: -1, y: 0 }));
+                    doopy.addComponent(new Component.Position("renderPos", TileToPixel(tilePos.value, tileMap.tileSize)));
+                    doopy.addComponent(new Component.Object("sprite", Gfx.SpriteStore["cursor"]));
+                    doopy.addComponent(new Component.Number("sort", 3));
+                    doopy.addComponent(new Component.Number("colour", 0xFF2222FF));
+                }
+
+                
+                {
+                    let doopy = ecsManager.addEntity();
+                    doopy.addComponent(new Component.Tag("renderable"));
+                    let tilePos = doopy.addComponent(new Component.Position("tilePos", { x: -2, y: 0 }));
+                    doopy.addComponent(new Component.Position("renderPos", TileToPixel(tilePos.value, tileMap.tileSize)));
+                    doopy.addComponent(new Component.Object("sprite", Gfx.SpriteStore["cursor"]));
+                    doopy.addComponent(new Component.Number("sort", 3));
+                    doopy.addComponent(new Component.Number("colour", 0xFF22FF22));
+                }
+
+                
+                {
+                    let doopy = ecsManager.addEntity();
+                    doopy.addComponent(new Component.Tag("renderable"));
+                    let tilePos = doopy.addComponent(new Component.Position("tilePos", { x: -3, y: 0 }));
+                    doopy.addComponent(new Component.Position("renderPos", TileToPixel(tilePos.value, tileMap.tileSize)));
+                    doopy.addComponent(new Component.Object("sprite", Gfx.SpriteStore["cursor"]));
+                    doopy.addComponent(new Component.Number("sort", 3));
+                    doopy.addComponent(new Component.Number("colour", 0xFFFF22FF));
+                }
+
+                let test = ecsManager.addEntity();
+                test.addComponent(new Component.Number("sort", -10));
+                test.addComponent(new Component.Tag("renderable"));
 
                 let subSceneManager = self.attach("subSceneManager", new Engine.StateMachine<Engine.Scene>());
                 subSceneManager.register(SubScenes.Move);
@@ -82,13 +138,14 @@ namespace Scenes {
                 let ecs = self.fetch<ECS.Manager>("ecsManager");
 
                 let player = ecs.getFirst("player");
-                let tileMap = self.fetch<E.TileMap>("tileMap");
+                let tileMap = ecs.getFirst("levelMap").getComponent<ECS.Component.Object<E.TileMap>>("tileMap").value;
                 let camera = self.fetch<E.Camera>("camera");
                 let cameraGap = self.fetch<number>("cameraGap");
 
                 Gfx.SpriteStore["cursor"].update(now, delta);
 
                 System.handlePlayerInput(player);
+
                 let moving = player.getComponent<Component.Flag>("moving");
                 if (moving.value) {
                     System.handleCollision(player, tileMap);
@@ -113,23 +170,35 @@ namespace Scenes {
             render(gl: GL.Renderer, now: number, delta: number): void {
                 let self = this as E.Scene;
                 let ecs = self.fetch<ECS.Manager>("ecsManager");
-                let player = ecs.getFirst("player");
-                let tileMap = self.fetch<E.TileMap>("tileMap");
                 let camera = self.fetch<E.Camera>("camera");
 
                 gl.bkg(0, 0, 0);
 
-                Gfx.TileMap.draw(gl, camera, tileMap);
+                let entities = ecs.getAll("renderable");
 
-                gl.col = 0xFFFFFFFF;
-                let sprite = player.getComponent<Component.Object<Gfx.Sprite>>("sprite").value;
-                let renderPos = player.getComponent<Component.Position>("renderPos").value;
+                // Create draw system calls for each renderable entity
+                // TileMap
+                // Sprite
+                // 9Patch
+                // Text
+                entities.forEach(
+                    (entity, index, array) => {
+                        if (entity.hasComponent("tileMap")) {
+                            let tileMap = entity.getComponent<ECS.Component.Object<E.TileMap>>("tileMap").value;
+                            Gfx.TileMap.draw(gl, camera, tileMap);
+                        } else if (entity.hasComponent("sprite")) {
+                            let sprite = entity.getComponent<Component.Object<Gfx.Sprite>>("sprite").value;
+                            let renderPos = entity.getComponent<Component.Position>("renderPos").value;
 
-                Gfx.Texture.draw({
-                    renderer: gl,
-                    texture: sprite.currentFrame.texture,
-                    position: V2.sub(renderPos, camera.position)
-                });
+                            gl.col = Component.coalesceValue(entity.getComponent<Component.Number>("colour"), 0xFFFFFFFF);
+
+                            Gfx.Texture.draw({
+                                renderer: gl,
+                                texture: sprite.currentFrame.texture,
+                                position: V2.sub(renderPos, camera.position)
+                            });
+                        }
+                    });
 
                 gl.col = 0xFFFF8888;
                 Gfx.NinePatch.draw(gl, Gfx.NinePatchStore["dialog"], 24, 0, 8, 18);
