@@ -40,8 +40,23 @@ namespace Game {
                 {
                     texture: "cursor",
                     duration: 250
-                }
-                ]
+                }],
+                "quick-blink": [{
+                    texture: "cursor_light",
+                    duration: 150
+                },
+                {
+                    texture: "cursor",
+                    duration: 150
+                },
+                {
+                    texture: "cursor_dark",
+                    duration: 150
+                },
+                {
+                    texture: "cursor",
+                    duration: 150
+                }],
             }
         }
     ];
@@ -86,8 +101,6 @@ namespace Game {
             0xFF2d2d2d,
             false
         );
-
-        Gfx.SpriteStore["cursor"].play("blink", true);
 
         let dialog: Gfx.NinePatch = {
             tl: Assets.TextureStore["dialog_tl"], tc: Assets.TextureStore["dialog_t"], tr: Assets.TextureStore["dialog_tr"],

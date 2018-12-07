@@ -31,6 +31,14 @@ namespace Engine {
                 this.play("DEFAULT");
             }
 
+            clone(): Sprite {
+                let sprite = new Sprite(this.animations["DEFAULT"].clone());
+                for(let key in this.animations) {
+                    sprite.addAnimation(key, this.animations[key].clone());
+                }
+                return sprite;
+            }
+
             get currentAnimation(): Sprite.Animation {
                 return this.animationQueue[0];
             }
@@ -45,14 +53,16 @@ namespace Engine {
 
             play(animationName: string, loop: boolean = false): Sprite {
                 this.animationQueue.length = 0;
-                this.animations[animationName].loop = loop;
-                this.animationQueue.push(this.animations[animationName])
+                let animation = this.animations[animationName].clone();
+                animation.loop = loop;
+                this.animationQueue.push(animation);
                 return this;
             }
 
             then(animationName: string, loop: boolean = false): Sprite {
-                this.animations[animationName].loop = loop;
-                this.animationQueue.push(this.animations[animationName])
+                let animation = this.animations[animationName].clone();
+                animation.loop = loop;
+                this.animationQueue.push(animation);
                 return this;
             }
 
@@ -111,6 +121,10 @@ namespace Engine {
 
                 constructor(frames: Frame[]) {
                     this.frames = frames;
+                }
+
+                clone(): Animation {
+                    return new Animation(this.frames);
                 }
 
                 update(delta: number) {

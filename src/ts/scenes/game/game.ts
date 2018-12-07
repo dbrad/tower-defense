@@ -84,41 +84,25 @@ namespace Scenes {
                     player.addComponent(new Component.Flag("movingRight", false));
                     player.addComponent(new Component.Flag("movingUp", false));
                     player.addComponent(new Component.Flag("movingDown", false));
-                    player.addComponent(new Component.Object("sprite", Gfx.SpriteStore["cursor"]));
+                    let sprite: Gfx.Sprite = Gfx.SpriteStore["cursor"].clone()
+                    sprite.play("blink", true);
+                    player.addComponent(new Component.Object("sprite", sprite));
                     player.addComponent(new Component.Number("sort", 2));
                     player.addComponent(new Component.Number("colour", 0xFFFF2222));
                 }
 
-                {
+                // 0xAABBGGRR
+                for (let i = 0; i < 10; i++) {
                     let doopy = ecsManager.addEntity();
                     doopy.addComponent(new Component.Tag("renderable"));
-                    let tilePos = doopy.addComponent(new Component.Position("tilePos", { x: -1, y: 0 }));
+                    let tilePos = doopy.addComponent(new Component.Position("tilePos", { x: -2, y: i + 1 }));
                     doopy.addComponent(new Component.Position("renderPos", TileToPixel(tilePos.value, tileMap.tileSize)));
-                    doopy.addComponent(new Component.Object("sprite", Gfx.SpriteStore["cursor"]));
+                    let sprite1: Gfx.Sprite = Gfx.SpriteStore["cursor"].clone();
+                    (i % 2 == 0) ? sprite1.play("blink", true) : sprite1.play("quick-blink", true);
+                    doopy.addComponent(new Component.Object("sprite", sprite1));
                     doopy.addComponent(new Component.Number("sort", 3));
-                    doopy.addComponent(new Component.Number("colour", 0xFF2222FF));
-                }
-
-                
-                {
-                    let doopy = ecsManager.addEntity();
-                    doopy.addComponent(new Component.Tag("renderable"));
-                    let tilePos = doopy.addComponent(new Component.Position("tilePos", { x: -2, y: 0 }));
-                    doopy.addComponent(new Component.Position("renderPos", TileToPixel(tilePos.value, tileMap.tileSize)));
-                    doopy.addComponent(new Component.Object("sprite", Gfx.SpriteStore["cursor"]));
-                    doopy.addComponent(new Component.Number("sort", 3));
-                    doopy.addComponent(new Component.Number("colour", 0xFF22FF22));
-                }
-
-                
-                {
-                    let doopy = ecsManager.addEntity();
-                    doopy.addComponent(new Component.Tag("renderable"));
-                    let tilePos = doopy.addComponent(new Component.Position("tilePos", { x: -3, y: 0 }));
-                    doopy.addComponent(new Component.Position("renderPos", TileToPixel(tilePos.value, tileMap.tileSize)));
-                    doopy.addComponent(new Component.Object("sprite", Gfx.SpriteStore["cursor"]));
-                    doopy.addComponent(new Component.Number("sort", 3));
-                    doopy.addComponent(new Component.Number("colour", 0xFFFF22FF));
+                    let col = colourToNumber(randomInt(50,255), randomInt(50,255), randomInt(50,255), randomInt(175,255));
+                    doopy.addComponent(new Component.Number("colour", col));
                 }
 
                 let test = ecsManager.addEntity();
@@ -142,9 +126,13 @@ namespace Scenes {
                 let camera = self.fetch<E.Camera>("camera");
                 let cameraGap = self.fetch<number>("cameraGap");
 
-                Gfx.SpriteStore["cursor"].update(now, delta);
-
                 System.handlePlayerInput(player);
+
+                let spriteEntities = ecs.getAll("sprite");
+                spriteEntities.forEach(entity => {
+                    let sprite = entity.getComponent<Component.Object<Gfx.Sprite>>("sprite").value;
+                    sprite.update(now, delta);
+                });
 
                 let moving = player.getComponent<Component.Flag>("moving");
                 if (moving.value) {
