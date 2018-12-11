@@ -71,6 +71,20 @@ namespace Scenes {
                     tileMapEntity.addComponent(new Component.Tag("renderable"));
                 }
 
+                {
+                    let ninePatch = ecs.addEntity();
+                    ninePatch.addComponent(new Component.Position("tilePos", { x: 24, y: 0 }));
+                    ninePatch.addComponent(
+                        new Component.Object<Gfx.NinePatch.Data>("9patch",
+                            {
+                                name: "dialog",
+                                colour: 0xFFFF8888,
+                                tileSize: { x: 8, y: 18 }
+                            }));
+                    ninePatch.addComponent(new Component.Number("sort", 9));
+                    ninePatch.addComponent(new Component.Tag("renderable"));
+                }
+
                 let player = ecs.addEntity();
                 {
                     player.addComponent(new Component.Tag("player"));
@@ -198,10 +212,7 @@ namespace Scenes {
 
                 Engine.Camera.update(camera, now);
             },
-            render(gl: GL.Renderer, now: number, delta: number): void {
-                gl.col = 0xFFFF8888;
-                Gfx.NinePatch.draw(gl, Gfx.NinePatchStore["dialog"], 24, 0, 8, 18);
-            }
+            render(gl: GL.Renderer, now: number, delta: number): void { }
         });
     }
 }

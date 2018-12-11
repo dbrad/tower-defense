@@ -8,6 +8,7 @@ namespace Scenes {
             import Input = Engine.Input;
             import ECS = Engine.ECS;
             import Component = ECS.Component;
+            import Gfx = Engine.Graphics;
             export let Move = new Engine.Scene({
                 name: "Move",
                 transitionIn(parentScene: Engine.Scene) {
@@ -19,6 +20,36 @@ namespace Scenes {
                     let tileMap =
                         ecs.getFirst("levelMap")
                             .getComponent<ECS.Component.Object<Engine.TileMap>>("tileMap").value;
+
+                    {
+                        let text = self.ecsManager.addEntity();
+                        text.addComponent(new Component.Position("renderPos", { x: 28 * 16, y: 8 }));
+                        text.addComponent(
+                            new Component.Object<Gfx.Text.Data>("text",
+                                {
+                                    text: "Move Mode",
+                                    textAlign: Gfx.Text.Alignment.CENTER,
+                                    wrapWidth: 0,
+                                    colour: 0xFFFFFFFF
+                                }));
+                        text.addComponent(new Component.Number("sort", 10));
+                        text.addComponent(new Component.Tag("renderable"));
+                    }
+
+                    {
+                        let text = self.ecsManager.addEntity();
+                        text.addComponent(new Component.Position("renderPos", { x: (24 * 16) + 8, y: Engine.Core.HEIGHT - 16 }));
+                        text.addComponent(
+                            new Component.Object<Gfx.Text.Data>("text",
+                                {
+                                    text: "Space: Build",
+                                    textAlign: Gfx.Text.Alignment.LEFT,
+                                    wrapWidth: 0,
+                                    colour: 0xFFFFFFFF
+                                }));
+                        text.addComponent(new Component.Number("sort", 10));
+                        text.addComponent(new Component.Tag("renderable"));
+                    }
 
                     Input.bindControl("RIGHT",
                         () => {
@@ -54,13 +85,13 @@ namespace Scenes {
 
                     Input.bindControl("ACTION",
                         () => {
-                            
+
                         },
                         () => {
                             let tilePos = player.getComponent<Component.Position>("tilePos").value;
                             let entities = Engine.TileMap.getEntities(tileMap, tilePos);
                             let blocking = entities.filter(entity => entity.hasComponent("blocking"));
-                            if(blocking.length === 0) {
+                            if (blocking.length === 0) {
                                 let stateManager = parentScene.subSceneManager;
                                 stateManager.push("Build", parentScene);
                             }

@@ -17,12 +17,12 @@ namespace Scenes {
                     let ecs = self.ecsManager;
                     {
                         let text = ecs.addEntity();
-                        text.addComponent(new Component.Position("renderPos", { x: Engine.Core.WIDTH - 8, y: 8 }));
+                        text.addComponent(new Component.Position("renderPos", { x: 28 * 16, y: 8 }));
                         text.addComponent(
                             new Component.Object<Gfx.Text.Data>("text",
                                 {
-                                    text: "Build Menu",
-                                    textAlign: Gfx.Text.Alignment.RIGHT,
+                                    text: "Build Mode",
+                                    textAlign: Gfx.Text.Alignment.CENTER,
                                     wrapWidth: 0,
                                     colour: 0xFFFFFFFF
                                 }));
@@ -30,7 +30,37 @@ namespace Scenes {
                         text.addComponent(new Component.Tag("renderable"));
                     }
 
-                    Input.bindControl("ACTION",
+                    {
+                        let text = ecs.addEntity();
+                        text.addComponent(new Component.Position("renderPos", { x: (24 * 16) + 8, y: Engine.Core.HEIGHT - 16 }));
+                        text.addComponent(
+                            new Component.Object<Gfx.Text.Data>("text",
+                                {
+                                    text: "Esc: Back",
+                                    textAlign: Gfx.Text.Alignment.LEFT,
+                                    wrapWidth: 0,
+                                    colour: 0xFFFFFFFF
+                                }));
+                        text.addComponent(new Component.Number("sort", 10));
+                        text.addComponent(new Component.Tag("renderable"));
+                    }
+
+                    {
+                        let text = ecs.addEntity();
+                        text.addComponent(new Component.Position("renderPos", { x: (24 * 16) + 8, y: Engine.Core.HEIGHT - 24 }));
+                        text.addComponent(
+                            new Component.Object<Gfx.Text.Data>("text",
+                                {
+                                    text: "Space: Confirm",
+                                    textAlign: Gfx.Text.Alignment.LEFT,
+                                    wrapWidth: 0,
+                                    colour: 0xFFFFFFFF
+                                }));
+                        text.addComponent(new Component.Number("sort", 10));
+                        text.addComponent(new Component.Tag("renderable"));
+                    }
+
+                    Input.bindControl("BACK",
                         () => {
 
                         },

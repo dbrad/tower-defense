@@ -73,6 +73,7 @@ namespace Game {
         Input.Controls["LEFT"] = [37, 65];
         Input.Controls["RIGHT"] = [39, 68];
         Input.Controls["ACTION"] = [13, 32];
+        Input.Controls["BACK"] = [27];
 
         // @ifdef DEBUG
         Stats.init(
