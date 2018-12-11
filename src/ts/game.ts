@@ -58,11 +58,82 @@ namespace Game {
                     duration: 150
                 }],
             }
+        },
+        {
+            name: "spawner",
+            animations: {
+                "DEFAULT": [{
+                    texture: "spawner",
+                    duration: 0
+                }]
+            }
+        },
+        {
+            name: "arrow",
+            animations: {
+                "DEFAULT": [{
+                    texture: "arrow_cart",
+                    duration: 0
+                }],
+                "blink": [{
+                    texture: "arrow_cart",
+                    colour: 0xDD2222FF,
+                    duration: 350
+                },
+                {
+                    texture: "arrow_cart",
+                    colour: 0x992222FF,
+                    duration: 350
+                },
+                {
+                    texture: "arrow_cart",
+                    colour: 0x552222FF,
+                    duration: 350
+                },
+                {
+                    texture: "arrow_cart",
+                    colour: 0x992222FF,
+                    duration: 350
+                }],
+            }
+        },
+        {
+            name: "arrow_diag",
+            animations: {
+                "DEFAULT": [{
+                    texture: "arrow_diag",
+                    duration: 0
+                }],
+                "blink": [{
+                    texture: "arrow_diag",
+                    colour: 0x882222FF,
+                    duration: 350
+                },
+                {
+                    texture: "arrow_diag",
+                    colour: 0x662222FF,
+                    duration: 350
+                },
+                {
+                    texture: "arrow_diag",
+                    colour: 0x442222FF,
+                    duration: 350
+                },
+                {
+                    texture: "arrow_diag",
+                    colour: 0x662222FF,
+                    duration: 350
+                }],
+            }
         }
     ];
     //#endregion
+    
     export interface GameState {
         version: string;
+        wallPoints: number;
+        towerPoints: number;
+        upgradePoint: number;
     }
 
     export let gameState: GameState = null;
@@ -83,7 +154,7 @@ namespace Game {
         Engine.Tile.CreateAndStore(
             "north_wall",
             Assets.TextureStore['brick'],
-            0xFFff6777,
+            0xFF2d2d2d,
             true
         );
 
@@ -91,14 +162,14 @@ namespace Game {
         Engine.Tile.CreateAndStore(
             "wall",
             Assets.TextureStore['brick'],
-            0xFFff6777,
+            0xFF2d2d2d,
             true
         );
 
         Engine.Tile.CreateAndStore(
             "floor",
             Assets.TextureStore['brick'],
-            0xFF2d2d2d,
+            0xFF050505,
             false
         );
 

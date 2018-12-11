@@ -1,6 +1,6 @@
 {
     "include": [
-        "build/tmp/**/app.ts"
+        "src/ts/**/*.ts"
     ],
     "exclude": [
         "node_modules",

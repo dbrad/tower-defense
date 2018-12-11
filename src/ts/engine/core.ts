@@ -1,50 +1,14 @@
 /// <reference path="state.ts" />
+/// <reference path="scene.ts" />
 /// <reference path="gl.ts" />
-/// <reference path="graphics.ts" />
 /// <reference path="input.ts" />
+/// <reference path="camera.ts" />
 // @ifdef DEBUG
 /// <reference path="debug.ts" />
 /// <reference path="stats.ts" />
 // @endif
 
 namespace Engine {
-    export class Scene implements State {
-        public name: string;
-        public transitionIn: (...args: any[]) => void;
-        public transitionOut: () => void;
-        public update: (now: number, delta: number) => void;
-        public render: (gl: GL.Renderer, now: number, delta: number) => void;
-
-        constructor(definition: Scene.Definition) {
-            this.transitionIn = definition.transitionIn;
-            this.transitionOut = () => {
-                this._storage = {};
-                definition.transitionOut();
-            };
-            this.update = definition.update;
-            this.render = definition.render;
-            this.name = definition.name;
-        }
-
-        protected _storage: { [key: string]: any } = {};
-        public attach<T>(name: string, object: T): T {
-            //@ifdef DEBUG
-            DEBUG.assert(this._storage[name] == null, `${name} is already attached.`);
-            //@endif
-            this._storage[name] = object;
-            return object;
-        }
-        public fetch<T>(name: string): T {
-            return this._storage[name] as T;
-        }
-    }
-
-    export namespace Scene {
-        export interface Definition extends State {
-            update(now: number, delta: number): void;
-            render(gl: GL.Renderer, now: number, delta: number): void;
-        }
-    }
 
     export namespace Core {
         let _glCanvas: HTMLCanvasElement;
@@ -89,8 +53,8 @@ namespace Engine {
                 let hw = ~~(WIDTH / 2);
                 let hh = ~~(HEIGHT / 2);
                 _gl.col = 0xFFFFFFFF;
-                Graphics.Text.draw(_gl, "game paused", hw, hh - 8, Graphics.Text.Alignment.CENTER);
-                Graphics.Text.draw(_gl, "click here to resume", hw, hh + 8, Graphics.Text.Alignment.CENTER);
+                Graphics.Text.draw(_gl, "game paused", { x: hw, y: hh - 8 }, Graphics.Text.Alignment.CENTER);
+                Graphics.Text.draw(_gl, "click here to resume", { x: hw, y: hh + 8 }, Graphics.Text.Alignment.CENTER);
             }
             _gl.flush();
         }
@@ -121,6 +85,7 @@ namespace Engine {
         export function init(glCanvas: HTMLCanvasElement): void {
             _glCanvas = glCanvas;
             _gl = GL.Renderer(_glCanvas);
+            Camera.current = Camera.create({ x: 0, y: 0 }, { x: WIDTH, y: HEIGHT });
 
             _scenes = new StateMachine<Scene>();
             WIDTH = _gl.canvas.width;

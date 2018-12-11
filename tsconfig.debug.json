@@ -11,6 +11,6 @@
         "outFile": "app.js",
         "noEmitOnError": true,
         "noImplicitAny": true,
-        "target": "es2015"
+        "target": "es2015",
     }
 }

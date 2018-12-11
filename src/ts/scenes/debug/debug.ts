@@ -28,9 +28,9 @@ namespace Scenes {
             let hw = ~~(Core.WIDTH / 2);
 
             let self: E.Scene = this as E.Scene;
-            Gfx.Text.draw(gl, "Assertion failed.", hw, 16, Gfx.Text.Alignment.CENTER);
-            Gfx.Text.draw(gl, "Check the console for details.", hw, 24, Gfx.Text.Alignment.CENTER);
-            Gfx.Text.draw(gl, self.fetch<string>("message"), hw, 48, Gfx.Text.Alignment.CENTER, 240);
+            Gfx.Text.draw(gl, "Assertion failed.", { x: hw, y: 16 }, Gfx.Text.Alignment.CENTER);
+            Gfx.Text.draw(gl, "Check the console for details.", { x: hw, y: 24 }, Gfx.Text.Alignment.CENTER);
+            Gfx.Text.draw(gl, self.fetch<string>("message"), { x: hw, y: 48 }, Gfx.Text.Alignment.CENTER, 240);
         }
     });
 }

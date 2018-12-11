@@ -26,13 +26,13 @@ namespace Game {
         },
         'tiles': {
             loc: 'res/test.png',
-            sWidth: 8,
-            sHeight: 8,
+            sWidth: 16,
+            sHeight: 16,
             textures: [
                 ['brick', 'cursor', 'cursor_dark', 'cursor_light'],
-                ['dialog_tl', 'dialog_t', 'dialog_tr', 'blank03'],
-                ['dialog_ml', 'dialog_m', 'dialog_mr', 'blank04'],
-                ['dialog_bl', 'dialog_b', 'dialog_br', 'blank05']
+                ['dialog_tl', 'dialog_t', 'dialog_tr', 'arrow_cart'],
+                ['dialog_ml', 'dialog_m', 'dialog_mr', 'arrow_diag'],
+                ['dialog_bl', 'dialog_b', 'dialog_br', 'spawner']
             ]
         },
         'irreg': {

@@ -6,9 +6,9 @@
 /// <reference path="../../engine/entity.ts" />
 /// <reference path="../../engine/camera.ts" />
 /// <reference path="../../systems.ts" />
-/// <reference path="game.move.ts" />
-/// <reference path="game.build.ts" />
-/// <reference path="game.defend.ts" />
+/// <reference path="./game.move.ts" />
+/// <reference path="./game.build.ts" />
+/// <reference path="./game.defend.ts" />
 
 namespace Scenes {
     export namespace Game {
@@ -40,13 +40,9 @@ namespace Scenes {
             name: "Game",
             transitionIn() {
                 let self = this as E.Scene;
+                let ecs = self.ecsManager;
 
-                self.attach("cameraGap", 8 * 6);
-                self.attach("camera", Engine.Camera.create({ x: 0, y: 0 }, { x: 24 * 8, y: 18 * 8 }));
-
-                let ecsManager = self.attach("ecsManager", new ECS.Manager());
-
-                ecsManager.on("renderable", "added",
+                ecs.on("renderable", "added",
                     (entity, collection, event) => {
                         collection.sort(
                             (entityA: ECS.Entity, entityB: ECS.Entity): number => {
@@ -57,25 +53,27 @@ namespace Scenes {
                     });
 
                 let tileMap: E.TileMap = {
-                    mapSize: { x: 32, y: 16 },
-                    tileSize: 8,
+                    mapSize: { x: 24, y: 24 },
+                    tileSize: 16,
                     tiles: []
                 };
 
+                self.attach("cameraGap", tileMap.tileSize * 6);
+                Engine.Camera.current = Engine.Camera.create({ x: 0, y: 0 }, { x: 24 * tileMap.tileSize, y: 18 * tileMap.tileSize })
+
                 makeMap(tileMap);
 
-                let tileMapEntity = ecsManager.addEntity();
+                let tileMapEntity = ecs.addEntity();
                 {
-                    tileMapEntity.addComponent(new Component.Tag("renderable"));
                     tileMapEntity.addComponent(new Component.Tag("levelMap"));
                     tileMapEntity.addComponent(new Component.Object("tileMap", tileMap));
                     tileMapEntity.addComponent(new Component.Number("sort", 1));
+                    tileMapEntity.addComponent(new Component.Tag("renderable"));
                 }
 
-                let player = ecsManager.addEntity();
+                let player = ecs.addEntity();
                 {
                     player.addComponent(new Component.Tag("player"));
-                    player.addComponent(new Component.Tag("renderable"));
                     let tilePos = player.addComponent(new Component.Position("tilePos", { x: 1, y: 1 }));
                     player.addComponent(new Component.Position("renderPos", TileToPixel(tilePos.value, tileMap.tileSize)));
                     player.addComponent(new Component.Position("targetTile", CopyV2(tilePos.value)));
@@ -84,46 +82,91 @@ namespace Scenes {
                     player.addComponent(new Component.Flag("movingRight", false));
                     player.addComponent(new Component.Flag("movingUp", false));
                     player.addComponent(new Component.Flag("movingDown", false));
-                    let sprite: Gfx.Sprite = Gfx.SpriteStore["cursor"].clone()
-                    sprite.play("blink", true);
-                    player.addComponent(new Component.Object("sprite", sprite));
+                    {
+                        let sprite: Gfx.Sprite = Gfx.SpriteStore["cursor"].clone();
+                        sprite.play("blink", true);
+                        sprite.setColour(0xFF00FF00);
+                        player.addComponent(new Component.Object("sprite", sprite));
+                    }
                     player.addComponent(new Component.Number("sort", 2));
-                    player.addComponent(new Component.Number("colour", 0xFFFF2222));
+                    player.addComponent(new Component.Tag("renderable"));
+                    E.TileMap.mapEntity(player, tileMap, tilePos.value);
+                }
+
+                let spawner = ecs.addEntity();
+                {
+                    spawner.addComponent(new Component.Tag("blocking"));
+                    let tilePos = spawner.addComponent(new Component.Position("tilePos", { x: 1, y: 1 }));
+                    spawner.addComponent(new Component.Position("renderPos", TileToPixel(tilePos.value, tileMap.tileSize)));
+                    spawner.addComponent(new Component.Position("targetTile", CopyV2(tilePos.value)));
+                    {
+                        let sprite: Gfx.Sprite = Gfx.SpriteStore["spawner"].clone();
+                        sprite.setColour(0xFF0000FF);
+                        spawner.addComponent(new Component.Object("sprite", sprite));
+                    }
+                    spawner.addComponent(new Component.Number("sort", 2));
+                    spawner.addComponent(new Component.Tag("renderable"));
+                    E.TileMap.mapEntity(spawner, tileMap, tilePos.value);
                 }
 
                 // 0xAABBGGRR
                 for (let i = 0; i < 10; i++) {
-                    let doopy = ecsManager.addEntity();
-                    doopy.addComponent(new Component.Tag("renderable"));
-                    let tilePos = doopy.addComponent(new Component.Position("tilePos", { x: -2, y: i + 1 }));
-                    doopy.addComponent(new Component.Position("renderPos", TileToPixel(tilePos.value, tileMap.tileSize)));
-                    let sprite1: Gfx.Sprite = Gfx.SpriteStore["cursor"].clone();
-                    (i % 2 == 0) ? sprite1.play("blink", true) : sprite1.play("quick-blink", true);
-                    doopy.addComponent(new Component.Object("sprite", sprite1));
-                    doopy.addComponent(new Component.Number("sort", 3));
-                    let col = colourToNumber(randomInt(50,255), randomInt(50,255), randomInt(50,255), randomInt(175,255));
-                    doopy.addComponent(new Component.Number("colour", col));
+                    let testCursor = ecs.addEntity();
+                    let tilePos = testCursor.addComponent(new Component.Position("tilePos", { x: -2, y: i + 1 }));
+                    testCursor.addComponent(new Component.Position("renderPos", TileToPixel(tilePos.value, tileMap.tileSize)));
+                    {
+                        let sprite: Gfx.Sprite = Gfx.SpriteStore["cursor"].clone();
+                        let col = colourToNumber(randomInt(50, 255), randomInt(50, 255), randomInt(50, 255), randomInt(175, 255));
+                        (i % 2 == 0) ? sprite.play("blink", true) : sprite.play("quick-blink", true);
+                        sprite.setColour(col);
+                        testCursor.addComponent(new Component.Object("sprite", sprite));
+                    }
+                    testCursor.addComponent(new Component.Number("sort", 3));
+                    testCursor.addComponent(new Component.Tag("renderable"));
                 }
 
-                let test = ecsManager.addEntity();
-                test.addComponent(new Component.Number("sort", -10));
-                test.addComponent(new Component.Tag("renderable"));
+                for (let i = 0; i < 10; i++) {
+                    let testCursor = ecs.addEntity();
+                    let tilePos = testCursor.addComponent(new Component.Position("tilePos", { x: 1, y: i + 2 }));
+                    testCursor.addComponent(new Component.Position("renderPos", TileToPixel(tilePos.value, tileMap.tileSize)));
+                    {
+                        let sprite: Gfx.Sprite = Gfx.SpriteStore["arrow"].clone()
+                        sprite.setRotation(Math.PI);
+                        sprite.play("blink", true);
+                        testCursor.addComponent(new Component.Object("sprite", sprite));
+                    }
+                    testCursor.addComponent(new Component.Number("sort", 4));
+                    testCursor.addComponent(new Component.Tag("renderable"));
+                }
 
-                let subSceneManager = self.attach("subSceneManager", new Engine.StateMachine<Engine.Scene>());
-                subSceneManager.register(SubScenes.Move);
-                subSceneManager.register(SubScenes.Build);
-                subSceneManager.register(SubScenes.Defend);
-                subSceneManager.push("Move", this);
+                for (let i = 0; i < 10; i++) {
+                    let testCursor = ecs.addEntity();
+                    let tilePos = testCursor.addComponent(new Component.Position("tilePos", { x: i + 2, y: i + 2 }));
+                    testCursor.addComponent(new Component.Position("renderPos", TileToPixel(tilePos.value, tileMap.tileSize)));
+                    {
+                        let sprite: Gfx.Sprite = Gfx.SpriteStore["arrow_diag"].clone()
+                        sprite.setRotation(Math.PI);
+                        sprite.play("blink", true);
+                        testCursor.addComponent(new Component.Object("sprite", sprite));
+                    }
+                    testCursor.addComponent(new Component.Number("sort", 4));
+                    testCursor.addComponent(new Component.Tag("renderable"));
+                }
+
+                self.subSceneManager.register(SubScenes.Move);
+                self.subSceneManager.register(SubScenes.Build);
+                self.subSceneManager.register(SubScenes.Defend);
+                self.subSceneManager.push("Move", this);
             },
             transitionOut() {
             },
             update(now: number, delta: number): void {
                 let self = this as E.Scene;
-                let ecs = self.fetch<ECS.Manager>("ecsManager");
+                let ecs = self.ecsManager;
 
                 let player = ecs.getFirst("player");
                 let tileMap = ecs.getFirst("levelMap").getComponent<ECS.Component.Object<E.TileMap>>("tileMap").value;
-                let camera = self.fetch<E.Camera>("camera");
+                let camera = Engine.Camera.current
                 let cameraGap = self.fetch<number>("cameraGap");
 
                 System.handlePlayerInput(player);
@@ -138,7 +181,7 @@ namespace Scenes {
                 if (moving.value) {
                     System.handleCollision(player, tileMap);
                     if (moving.value) {
-                        System.moveEntity(player, now);
+                        System.moveEntity(player, tileMap, now);
                     }
                 }
 
@@ -156,38 +199,6 @@ namespace Scenes {
                 Engine.Camera.update(camera, now);
             },
             render(gl: GL.Renderer, now: number, delta: number): void {
-                let self = this as E.Scene;
-                let ecs = self.fetch<ECS.Manager>("ecsManager");
-                let camera = self.fetch<E.Camera>("camera");
-
-                gl.bkg(0, 0, 0);
-
-                let entities = ecs.getAll("renderable");
-
-                // Create draw system calls for each renderable entity
-                // TileMap
-                // Sprite
-                // 9Patch
-                // Text
-                entities.forEach(
-                    (entity, index, array) => {
-                        if (entity.hasComponent("tileMap")) {
-                            let tileMap = entity.getComponent<ECS.Component.Object<E.TileMap>>("tileMap").value;
-                            Gfx.TileMap.draw(gl, camera, tileMap);
-                        } else if (entity.hasComponent("sprite")) {
-                            let sprite = entity.getComponent<Component.Object<Gfx.Sprite>>("sprite").value;
-                            let renderPos = entity.getComponent<Component.Position>("renderPos").value;
-
-                            gl.col = Component.coalesceValue(entity.getComponent<Component.Number>("colour"), 0xFFFFFFFF);
-
-                            Gfx.Texture.draw({
-                                renderer: gl,
-                                texture: sprite.currentFrame.texture,
-                                position: V2.sub(renderPos, camera.position)
-                            });
-                        }
-                    });
-
                 gl.col = 0xFFFF8888;
                 Gfx.NinePatch.draw(gl, Gfx.NinePatchStore["dialog"], 24, 0, 8, 18);
             }

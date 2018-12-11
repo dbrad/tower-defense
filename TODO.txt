@@ -14,22 +14,36 @@ make update and render safe to call on un initialized scene state, so transition
 ideal state...
 update render run during transition out of old state, and in on new state... allows us to play with idea of visable transitions owned by the state
 
-render order is...
-    TileMap
-    9Patch entities
-    Text Entities
-    All other entites by sort order?
-    ...
-    or give each entity a sort order...
-    should a tilemap be jammed in an entity with a sort order?? maybe
-    system that takes all "renderable" entities, sorts on draw order, calls appropriate render call based on tag?
+Maybe make an entities collection that I can filter on further... maybe use built in js filters and such...
 
-    GetAllRenderable()
-    SortList()
-    Split by filtering on tag...
-        RenderForTag()
+Define these 3 modes and what they mean and what the player can do.
+Move Mode:
+Movement controls to move cursor
+Anything under the cursor shown in info side module
+Action key goes into build mode if on empty space
+action key goes into Modify Mode if on a wall or tower? should I put this all in build mode??
 
-Maybe make a entities collection that I can filter on further... maybe use built in js filters and such...
+Build Mode:
+Movement controls to select in menu
+Action to drill in, esc / back to go back
+
+
+Defend Mode:
+Movement controls to move cursor
+
+level-wall - not selectable
+level-ground
+spawner
+waypoint
+path
+tower
+wall
+
+each frame check what is under the cursor's tile? thats a lot of checks... 60 per second...
+or on move and on action, check what is under the cursors tile... single player friendly... can't use if other actors cause state change...
+emit tile coord event and have entities, sub and pub to that...
+ie cursor moves to 1,1... subs to 1,1 and emits an update on 1,1... would like only have events emitting every second or so at most...
+check on cursor move, and on entering move mode... i think thats all i need for now.... I think ill use the panel tp show the current wave enemy in defend mode..
 
 Game scene states
 - Build
@@ -70,3 +84,18 @@ Game scene states
         - award 4 wall points and 1 tower point 
         - go to build state again if map not complete (# of waves)
         - go to post-game as victory if waves are complete with >0 lives
+
+ENTITY FACTORY
+N
+T
+I
+T
+Y
+ 
+F
+A
+C
+T
+O
+R
+Y

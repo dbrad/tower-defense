@@ -36,7 +36,7 @@ namespace Scenes {
             let hw = ~~(Core.WIDTH / 2);
             let hh = ~~(Core.HEIGHT / 2);
 
-            Gfx.Text.draw(gl, "Winner is you.", hw, hh, Gfx.Text.Alignment.CENTER);
+            Gfx.Text.draw(gl, "Winner is you.", { x: hw, y: hh }, Gfx.Text.Alignment.CENTER);
         }
     });
 }

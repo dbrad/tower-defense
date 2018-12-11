@@ -87,7 +87,7 @@ namespace Engine {
                             let textures = _t.textures;
 
                             TextureAtlasStore[_tn] = glTexture;
-                            for(let texture of textures) {
+                            for (let texture of textures) {
                                 TextureStore[texture.name] = {
                                     atlas: glTexture,
                                     w: texture.width,

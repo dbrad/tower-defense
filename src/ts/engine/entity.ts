@@ -74,10 +74,10 @@ namespace Engine {
         }
 
         export class Entity {
-            private static __id: number = 0;
+            private static __id: number = 1;
             private _components: { [key: string]: Component } = {};
             private _manager: Manager;
-            public id: number;
+            public readonly id: number;
 
             constructor(manager?: Manager) {
                 this.id = Entity.__id++;
@@ -138,6 +138,7 @@ namespace Engine {
             }
         }
 
+
         type Event = "added" | "removed";
         type EventHandler = (entity: Entity, collection: Entity[], event: Event) => void;
 
@@ -146,18 +147,26 @@ namespace Engine {
             private _eventHandlers: { [key: string]: { [key: string]: EventHandler[] } } = {};
             public entities: Entity[] = [];
 
+            public reset() {
+                this.collections = {};
+                this._eventHandlers = {};
+                this.entities.length = 0;
+            }
+
             public addEntity(entity?: Entity): Entity {
                 if (entity == null) {
                     entity = new Entity(this);
                 } else {
                     entity.SetManager(this);
                 }
-                this.entities.push(entity);
+                this.entities[entity.id] = entity;
                 return entity;
             }
 
             public getAll(name: string): Entity[] {
-                return this.collections[name];
+                if (this.collections[name])
+                    return this.collections[name];
+                return [];
             }
 
             public getFirst(name: string): Entity {

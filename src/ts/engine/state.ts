@@ -18,6 +18,11 @@ namespace Engine {
             this._stateStack = [];
         }
 
+        reset() {
+            this._stateDictionary = {};
+            this._stateStack.length = 0;
+        }
+
         register(state: T): void {
             // @ifdef DEBUG
             DEBUG.assert(state.transitionIn != null, `State needs to have a 'transitionIn' method.`);

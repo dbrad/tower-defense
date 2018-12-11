@@ -55,7 +55,7 @@ namespace Engine {
 
         export function Renderer(canvas: HTMLCanvasElement): Renderer {
             var gl = canvas.getContext('webgl'),
-                VERTEX_SIZE = (4 * 2) + (4 * 2) + (4) + (4*3),
+                VERTEX_SIZE = (4 * 2) + (4 * 2) + (4) + (4 * 3),
                 MAX_BATCH = 10922, // floor((2 ^ 16) / 6)
                 MAX_STACK = 100,
                 MAT_SIZE = 6,
@@ -97,7 +97,7 @@ namespace Engine {
                         e=c;
                         l=_l;
                     }`
-                    ].join('\n'), 
+                    ].join('\n'),
                     [`precision lowp float;
                         // OUT Texture Coordinates
                         varying vec2 d;
@@ -225,7 +225,7 @@ namespace Engine {
                     mat[4] = stack[stackp + 4];
                     mat[5] = stack[stackp + 5];
                 },
-                'img': function (texture: WebGLTexture, x: number, y: number, w: number, h: number, u0: number, v0: number, u1: number, v1: number, light: V3 = {x: 1.0, y: 1.0, z: 1.0}): void {
+                'img': function (texture: WebGLTexture, x: number, y: number, w: number, h: number, u0: number, v0: number, u1: number, v1: number, light: V3 = { x: 1.0, y: 1.0, z: 1.0 }): void {
                     var x0 = x,
                         y0 = y,
                         x1 = x + w,

@@ -90,7 +90,7 @@ namespace System {
 
     let ECSStorage: { [key: number]: { [key: string]: any } } = {};
 
-    export function moveEntity(entity: ECS.Entity, now: number) {
+    export function moveEntity(entity: ECS.Entity, tileMap: Engine.TileMap, now: number) {
         let tilePos = entity.getComponent<Component.Position>("tilePos");
         let targetTile = entity.getComponent<Component.Position>("targetTile");
         let renderPos = entity.getComponent<Component.Position>("renderPos");
@@ -107,11 +107,11 @@ namespace System {
             ECSStorage[entity.id] = {};
         }
         if (ECSStorage[entity.id]["moveFn"] == null) {
-            ECSStorage[entity.id]["moveFn"] = Interpolator(now, 200, Easing.linear);
+            ECSStorage[entity.id]["moveFn"] = Interpolator(now, 160, Easing.linear);
         }
         let interp = ECSStorage[entity.id]["moveFn"].next(now);
-        let o = TileToPixel(tilePos.value, 8);
-        let d = TileToPixel(targetTile.value, 8);
+        let o = TileToPixel(tilePos.value, tileMap.tileSize);
+        let d = TileToPixel(targetTile.value, tileMap.tileSize);
 
         renderPos.value.x = o.x + Math.round((d.x - o.x) * interp.value);
         renderPos.value.y = o.y + Math.round((d.y - o.y) * interp.value);
@@ -119,7 +119,8 @@ namespace System {
         if (interp.done == true) {
             moving.value = false;
             tilePos.value = CopyV2(targetTile.value);
-            renderPos.value = TileToPixel(tilePos.value, 8);
+            renderPos.value = TileToPixel(tilePos.value, tileMap.tileSize);
+            Engine.TileMap.mapEntity(entity, tileMap, tilePos.value);
             delete ECSStorage[entity.id]["moveFn"];
         }
     }

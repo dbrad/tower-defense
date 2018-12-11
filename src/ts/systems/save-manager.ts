@@ -34,7 +34,10 @@ namespace SaveManager {
     //#region Game state initializer
     function initialGameState(): Game.GameState {
         let gameState: Game.GameState = {
-            version: "0.0.0"
+            version: "0.0.0",
+            wallPoints: 0,
+            towerPoints: 0,
+            upgradePoint: 0
         }
         return gameState;
     }
