@@ -53,8 +53,8 @@ namespace Engine {
         export function disable() {
             disabled = true;
             _isDown.forEach((value, index, array) => {
-                if(value) {
-                    _bindings[index].keyUp();
+                if (value) {
+                    _bindings[index] && _bindings[index].keyUp();
                 }
                 array[index] = false;
             });
@@ -76,9 +76,12 @@ namespace Engine {
         }
 
         export function unbindAll() {
-            for (let key in _bindings) {
-                delete _bindings[key];
-            }
+            _bindings.forEach(
+                (keyBind, keyCode) => {
+                    if (keyCode !== 73) {
+                        delete _bindings[keyCode];
+                    }
+                });
         }
 
         export function bindControl(control: string, keyDown: Function, keyUp: Function = () => { }): void {

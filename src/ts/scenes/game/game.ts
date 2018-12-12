@@ -58,7 +58,7 @@ namespace Scenes {
                     tiles: []
                 };
 
-                self.attach("cameraGap", tileMap.tileSize * 6);
+                self.attach("cameraGap", tileMap.tileSize * 7);
                 Engine.Camera.current = Engine.Camera.create({ x: 0, y: 0 }, { x: 24 * tileMap.tileSize, y: 18 * tileMap.tileSize })
 
                 makeMap(tileMap);
@@ -206,7 +206,7 @@ namespace Scenes {
                     if (gapX >= cameraGap || gapX <= -cameraGap || gapY >= cameraGap || gapY <= -cameraGap) {
                         let targetX = renderPos.x - ~~(camera.size.x / 2);
                         let targetY = renderPos.y - ~~(camera.size.y / 2);
-                        Engine.Camera.move(camera, { x: targetX, y: targetY }, now, 1500, Easing.outQuart);
+                        Engine.Camera.move(camera, { x: targetX, y: targetY }, now, 1200, Easing.outCubic);
                     }
                 }
 

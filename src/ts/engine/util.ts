@@ -54,6 +54,21 @@ function colourToNumber(r: number, g: number, b: number, a: number) {
     return out;
 }
 
+namespace Bit {
+    export function get(bit_store: number, offset: number, mask: number): number {
+        return (bit_store & mask) >> offset;
+    }
+
+    export function clear(bit_store: number, mask: number): number {
+        return bit_store &= ~(mask);
+    }
+
+    export function set(bit_store: number, value: number, offset: number, mask: number) {
+        bit_store = clear(bit_store, mask)
+        return bit_store |= (value << offset);
+    }
+}
+
 const Easing = {
     // no easing, no acceleration
     linear: function (t: number): number {

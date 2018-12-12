@@ -138,7 +138,6 @@ namespace Engine {
             }
         }
 
-
         type Event = "added" | "removed";
         type EventHandler = (entity: Entity, collection: Entity[], event: Event) => void;
 

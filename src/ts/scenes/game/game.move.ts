@@ -85,16 +85,35 @@ namespace Scenes {
 
                     Input.bindControl("ACTION",
                         () => {
-
-                        },
-                        () => {
-                            let tilePos = player.getComponent<Component.Position>("tilePos").value;
-                            let entities = Engine.TileMap.getEntities(tileMap, tilePos);
-                            let blocking = entities.filter(entity => entity.hasComponent("blocking"));
-                            if (blocking.length === 0) {
-                                let stateManager = parentScene.subSceneManager;
-                                stateManager.push("Build", parentScene);
+                            player.getComponent<Component.Flag>("movingUp").value = false;
+                            player.getComponent<Component.Flag>("movingDown").value = false;
+                            player.getComponent<Component.Flag>("movingLeft").value = false;
+                            player.getComponent<Component.Flag>("movingRight").value = false;
+                            if (!player.getComponent<Component.Flag>("moving").value) {
+                                let tilePos = player.getComponent<Component.Position>("tilePos").value;
+                                let entities = Engine.TileMap.getEntities(tileMap, tilePos);
+                                let blocking = entities.filter(entity => entity.hasComponent("blocking"));
+                                if (blocking.length === 0) {
+                                    let stateManager = parentScene.subSceneManager;
+                                    stateManager.push("Build", parentScene);
+                                }
+                            } else {
+                                window.setTimeout(() => {
+                                    let tilePos = player.getComponent<Component.Position>("tilePos").value;
+                                    let entities = Engine.TileMap.getEntities(tileMap, tilePos);
+                                    let blocking = entities.filter(entity => entity.hasComponent("blocking"));
+                                    if (blocking.length === 0 && !player.getComponent<Component.Flag>("moving").value) {
+                                        let stateManager = parentScene.subSceneManager;
+                                        stateManager.push("Build", parentScene);
+                                    }
+                                }, 160);
                             }
+                        }, () => { });
+
+                    Input.bindKey(73,
+                        () => { },
+                        () => {
+                            console.log(self.ecsManager);
                         });
                 },
                 transitionOut() {

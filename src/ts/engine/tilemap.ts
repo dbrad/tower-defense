@@ -74,16 +74,31 @@ namespace Engine {
     }
 
     /*
-    000 0000 0000 0000 0000 0000 0000 0000
+    000 |0000 0000 0000 0000 0000 |0000 000|0
 
     1 bit to solid (0-1), offset = 0
     7 bits => tileid (0-127), offset = 1
-    12 bits => head entity id (0-4095), offset = 8 
-    19 bits unallocated, offset = 12
+    20 bits => head entity id (1-‭1,048,575‬), offset = 8 
+    3 bits unallocated, offset = 28
 
     |= (val << offset) add
     &= ~(bitval << offset) remove
     */
+
+    let COLLISION_OFFSET = 0;
+    let COLLISION_SIZE = 1;
+    let COLLISION_MASK = 0x1;
+
+    let TILE_ID_OFFSET = 1;
+    let TILE_ID_SIZE = 7;
+    let TILE_ID_MASK = 0x7f << TILE_ID_OFFSET;
+
+    let ENTITY_ID_OFFSET = 8;
+    let ENTITY_ID_SIZE = 20;
+    let ENTITY_ID_MASK = 0xFFFFF << ENTITY_ID_OFFSET;
+
+    let UNUSED_OFFSET = ENTITY_ID_OFFSET + ENTITY_ID_SIZE;
+    let UNUSED_SIZE = 31 - ENTITY_ID_SIZE - TILE_ID_SIZE - COLLISION_SIZE;
     export interface TileMap {
         tiles: number[];
         mapSize: V2;
@@ -121,7 +136,7 @@ namespace Engine {
 
         export function getEntities(tileMap: TileMap, position: V2): ECS.Entity[] {
             let i = position.x + (position.y * tileMap.mapSize.x);
-            let id = ((tileMap.tiles[i]) & ~(0x7F << 20)) >> 12;
+            let id = Bit.get(tileMap.tiles[i], ENTITY_ID_OFFSET, ENTITY_ID_MASK);
             let head = EntityStorage[id];
             let list: ECS.Entity[] = [];
             let current = head;
@@ -147,11 +162,11 @@ namespace Engine {
                 let i = node.position.x + (node.position.y * tileMap.mapSize.x);
 
                 // remap id if this was the head
-                let id = ((tileMap.tiles[i]) & ~(0x7F << 20)) >> 12;
+                let id = Bit.get(tileMap.tiles[i], ENTITY_ID_OFFSET, ENTITY_ID_MASK);
                 if (id == node.ecs.id) {
-                    tileMap.tiles[i] &= ~(0xFFF << 12);
+                    tileMap.tiles[i] = Bit.clear(tileMap.tiles[i], ENTITY_ID_MASK);
                     if (node.next) {
-                        tileMap.tiles[i] |= (node.next.ecs.id << 12);
+                        tileMap.tiles[i] = Bit.set(tileMap.tiles[i], node.next.ecs.id, ENTITY_ID_OFFSET, ENTITY_ID_MASK);
                     }
                 }
 
@@ -165,12 +180,12 @@ namespace Engine {
             let i = position.x + (position.y * tileMap.mapSize.x);
 
             // get the head entity id of this position
-            let id = ((tileMap.tiles[i]) & ~(0x7F << 20)) >> 12;
+            let id = Bit.get(tileMap.tiles[i], ENTITY_ID_OFFSET, ENTITY_ID_MASK);
 
             // if this position already has at least 1 entity we need to push the new entity onto the head.
             if (id !== 0) {
                 // clear the stored head id
-                tileMap.tiles[i] &= ~(0xFFF << 12);
+                tileMap.tiles[i] = Bit.clear(tileMap.tiles[i], ENTITY_ID_MASK);
 
                 // map the the node to the front of the previous head
                 let headNode = EntityStorage[id];
@@ -181,7 +196,7 @@ namespace Engine {
             node.position = CopyV2(position);
 
             // always update the head to the new entity id
-            tileMap.tiles[i] |= (entity.id << 12);
+            tileMap.tiles[i] = Bit.set(tileMap.tiles[i], entity.id, ENTITY_ID_OFFSET, ENTITY_ID_MASK);
 
             // always update the storage for this entity
             EntityStorage[entity.id] = node;
