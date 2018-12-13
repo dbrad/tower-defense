@@ -9,10 +9,10 @@ namespace EntityFactory {
 
     export function Text(position: V2, textData: Gfx.Text.Data, sort: number = 10): ECS.Entity {
         let text = new ECS.Entity();
-        text.addComponent(new Component.Position("renderPos", position));
-        text.addComponent(new Component.Object<Gfx.Text.Data>("text", textData));
-        text.addComponent(new Component.Number("sort", sort));
-        text.addComponent(new Component.Tag("renderable"));
+        text.addComponent("renderPos", position);
+        text.addComponent("text", textData);
+        text.addComponent("sort", sort);
+        text.addTag("renderable");
         return text;
     }
 }

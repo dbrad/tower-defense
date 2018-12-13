@@ -53,21 +53,21 @@ namespace Scenes {
                     let sel: number = 0;
                     options.forEach((value, index, array) => {
                         let text = ecs.addEntity();
-                        text.addComponent(new Component.Position("renderPos", { x: 28 * 16, y: 32 + (16 * index) }));
+                        text.addComponent<V2>("renderPos", { x: 28 * 16, y: 32 + (16 * index) });
 
                         let initVal = value;
                         if (sel === index) { initVal = `(${initVal})`; }
-                        let data = text.addComponent(
-                            new Component.Object<Gfx.Text.Data>("text",
-                                {
-                                    text: initVal,
-                                    textAlign: Gfx.Text.Alignment.CENTER,
-                                    wrapWidth: 0,
-                                    colour: 0xFFFFFFFF
-                                }));
+                        let data = text.addComponent<Gfx.Text.Data>(
+                            "text",
+                            {
+                                text: initVal,
+                                textAlign: Gfx.Text.Alignment.CENTER,
+                                wrapWidth: 0,
+                                colour: 0xFFFFFFFF
+                            });
 
-                        text.addComponent(new Component.Number("sort", 10));
-                        text.addComponent(new Component.Tag("renderable"));
+                        text.addComponent<number>("sort", 10);
+                        text.addTag("renderable");
 
                         Engine.Events.on(
                             self.eventManager,
@@ -98,6 +98,30 @@ namespace Scenes {
                         () => {
                             switch (options[sel]) {
                                 case "Build Wall":
+                                    let tileMap =
+                                        parentScene.ecsManager
+                                            .getFirst("levelMap")
+                                            .getValue<Engine.TileMap>("tileMap");
+
+                                    let player = parentScene.ecsManager.getFirst("player");
+                                    let position = player.getValue<V2>("tilePos");
+
+                                    {
+                                        let wall = parentScene.ecsManager.addEntity();
+                                        wall.addTag("blocking");
+                                        let tilePos = wall.addComponent<V2>("tilePos", CopyV2(position));
+                                        wall.addComponent<V2>("renderPos", TileToPixel(tilePos.value, tileMap.tileSize));
+                                        {
+                                            let sprite: Gfx.Sprite = Gfx.SpriteStore["spawner"].clone();
+                                            sprite.setColour(0xFF00FF00);
+                                            wall.addComponent("sprite", sprite);
+                                        }
+                                        wall.addComponent("sort", 2);
+                                        wall.addTag("renderable");
+                                        Engine.TileMap.mapEntity(wall, tileMap, tilePos.value);
+                                    }
+
+                                    parentScene.subSceneManager.pop(parentScene);
                                     break;
                                 case "Build Tower":
                                     break;

@@ -10,13 +10,13 @@ namespace System {
     import Component = ECS.Component;
 
     export function handlePlayerInput(entity: ECS.Entity): void {
-        let tilePos = entity.getComponent<Component.Position>("tilePos");
-        let targetTile = entity.getComponent<Component.Position>("targetTile");
-        let moving = entity.getComponent<Component.Flag>("moving");
-        let movingRight = entity.getComponent<Component.Flag>("movingRight");
-        let movingLeft = entity.getComponent<Component.Flag>("movingLeft");
-        let movingUp = entity.getComponent<Component.Flag>("movingUp");
-        let movingDown = entity.getComponent<Component.Flag>("movingDown");
+        let tilePos = entity.getComponent<V2>("tilePos");
+        let targetTile = entity.getComponent<V2>("targetTile");
+        let moving = entity.getComponent<boolean>("moving");
+        let movingRight = entity.getComponent<boolean>("movingRight");
+        let movingLeft = entity.getComponent<boolean>("movingLeft");
+        let movingUp = entity.getComponent<boolean>("movingUp");
+        let movingDown = entity.getComponent<boolean>("movingDown");
 
         // @ifdef DEBUG
         DEBUG.assert(tilePos != null, "Entity must have a 'tilePos' Position to move.");
@@ -50,13 +50,13 @@ namespace System {
     }
 
     export function handleCollision(entity: ECS.Entity, tileMap: Engine.TileMap) {
-        let tilePos = entity.getComponent<Component.Position>("tilePos");
-        let targetTile = entity.getComponent<Component.Position>("targetTile");
-        let moving = entity.getComponent<Component.Flag>("moving");
-        let movingRight = entity.getComponent<Component.Flag>("movingRight");
-        let movingLeft = entity.getComponent<Component.Flag>("movingLeft");
-        let movingUp = entity.getComponent<Component.Flag>("movingUp");
-        let movingDown = entity.getComponent<Component.Flag>("movingDown");
+        let tilePos = entity.getComponent<V2>("tilePos");
+        let targetTile = entity.getComponent<V2>("targetTile");
+        let moving = entity.getComponent<boolean>("moving");
+        let movingRight = entity.getComponent<boolean>("movingRight");
+        let movingLeft = entity.getComponent<boolean>("movingLeft");
+        let movingUp = entity.getComponent<boolean>("movingUp");
+        let movingDown = entity.getComponent<boolean>("movingDown");
 
         // @ifdef DEBUG
         DEBUG.assert(tilePos != null, "Entity must have a 'tilePos' Position to move.");
@@ -91,10 +91,10 @@ namespace System {
     let ECSStorage: { [key: number]: { [key: string]: any } } = {};
 
     export function moveEntity(entity: ECS.Entity, tileMap: Engine.TileMap, now: number) {
-        let tilePos = entity.getComponent<Component.Position>("tilePos");
-        let targetTile = entity.getComponent<Component.Position>("targetTile");
-        let renderPos = entity.getComponent<Component.Position>("renderPos");
-        let moving = entity.getComponent<Component.Flag>("moving");
+        let tilePos = entity.getComponent<V2>("tilePos");
+        let targetTile = entity.getComponent<V2>("targetTile");
+        let renderPos = entity.getComponent<V2>("renderPos");
+        let moving = entity.getComponent<boolean>("moving");
 
         // @ifdef DEBUG
         DEBUG.assert(tilePos != null, "Entity must have a 'tilePos' Position to move.");

@@ -18,79 +18,78 @@ namespace Scenes {
                     let ecs = parentScene.ecsManager;
                     let player = ecs.getFirst("player");
                     let tileMap =
-                        ecs.getFirst("levelMap")
-                            .getComponent<ECS.Component.Object<Engine.TileMap>>("tileMap").value;
+                        ecs.getFirst("levelMap").getValue<Engine.TileMap>("tileMap");
 
                     {
                         let text = self.ecsManager.addEntity();
-                        text.addComponent(new Component.Position("renderPos", { x: 28 * 16, y: 8 }));
-                        text.addComponent(
-                            new Component.Object<Gfx.Text.Data>("text",
-                                {
-                                    text: "Move Mode",
-                                    textAlign: Gfx.Text.Alignment.CENTER,
-                                    wrapWidth: 0,
-                                    colour: 0xFFFFFFFF
-                                }));
-                        text.addComponent(new Component.Number("sort", 10));
-                        text.addComponent(new Component.Tag("renderable"));
+                        text.addComponent<V2>("renderPos", { x: 28 * 16, y: 8 });
+                        text.addComponent<Gfx.Text.Data>(
+                            "text",
+                            {
+                                text: "Move Mode",
+                                textAlign: Gfx.Text.Alignment.CENTER,
+                                wrapWidth: 0,
+                                colour: 0xFFFFFFFF
+                            });
+                        text.addComponent("sort", 10);
+                        text.addTag("renderable");
                     }
 
                     {
                         let text = self.ecsManager.addEntity();
-                        text.addComponent(new Component.Position("renderPos", { x: (24 * 16) + 8, y: Engine.Core.HEIGHT - 16 }));
-                        text.addComponent(
-                            new Component.Object<Gfx.Text.Data>("text",
-                                {
-                                    text: "Space: Build",
-                                    textAlign: Gfx.Text.Alignment.LEFT,
-                                    wrapWidth: 0,
-                                    colour: 0xFFFFFFFF
-                                }));
-                        text.addComponent(new Component.Number("sort", 10));
-                        text.addComponent(new Component.Tag("renderable"));
+                        text.addComponent<V2>("renderPos", { x: (24 * 16) + 8, y: Engine.Core.HEIGHT - 16 });
+                        text.addComponent<Gfx.Text.Data>(
+                            "text",
+                            {
+                                text: "Space: Build",
+                                textAlign: Gfx.Text.Alignment.LEFT,
+                                wrapWidth: 0,
+                                colour: 0xFFFFFFFF
+                            });
+                        text.addComponent("sort", 10);
+                        text.addTag("renderable");
                     }
 
                     Input.bindControl("RIGHT",
                         () => {
-                            player.getComponent<Component.Flag>("movingRight").value = true;
+                            player.getComponent<boolean>("movingRight").value = true;
                         },
                         () => {
-                            player.getComponent<Component.Flag>("movingRight").value = false;
+                            player.getComponent<boolean>("movingRight").value = false;
                         });
 
                     Input.bindControl("LEFT",
                         () => {
-                            player.getComponent<Component.Flag>("movingLeft").value = true;
+                            player.getComponent<boolean>("movingLeft").value = true;
                         },
                         () => {
-                            player.getComponent<Component.Flag>("movingLeft").value = false;
+                            player.getComponent<boolean>("movingLeft").value = false;
                         });
 
                     Input.bindControl("DOWN",
                         () => {
-                            player.getComponent<Component.Flag>("movingDown").value = true;
+                            player.getComponent<boolean>("movingDown").value = true;
                         },
                         () => {
-                            player.getComponent<Component.Flag>("movingDown").value = false;
+                            player.getComponent<boolean>("movingDown").value = false;
                         });
 
                     Input.bindControl("UP",
                         () => {
-                            player.getComponent<Component.Flag>("movingUp").value = true;
+                            player.getComponent<boolean>("movingUp").value = true;
                         },
                         () => {
-                            player.getComponent<Component.Flag>("movingUp").value = false;
+                            player.getComponent<boolean>("movingUp").value = false;
                         });
 
                     Input.bindControl("ACTION",
                         () => {
-                            player.getComponent<Component.Flag>("movingUp").value = false;
-                            player.getComponent<Component.Flag>("movingDown").value = false;
-                            player.getComponent<Component.Flag>("movingLeft").value = false;
-                            player.getComponent<Component.Flag>("movingRight").value = false;
-                            if (!player.getComponent<Component.Flag>("moving").value) {
-                                let tilePos = player.getComponent<Component.Position>("tilePos").value;
+                            player.getComponent<boolean>("movingUp").value = false;
+                            player.getComponent<boolean>("movingDown").value = false;
+                            player.getComponent<boolean>("movingLeft").value = false;
+                            player.getComponent<boolean>("movingRight").value = false;
+                            if (!player.getComponent<boolean>("moving").value) {
+                                let tilePos = player.getComponent<V2>("tilePos").value;
                                 let entities = Engine.TileMap.getEntities(tileMap, tilePos);
                                 let blocking = entities.filter(entity => entity.hasComponent("blocking"));
                                 if (blocking.length === 0) {
@@ -99,10 +98,10 @@ namespace Scenes {
                                 }
                             } else {
                                 window.setTimeout(() => {
-                                    let tilePos = player.getComponent<Component.Position>("tilePos").value;
+                                    let tilePos = player.getComponent<V2>("tilePos").value;
                                     let entities = Engine.TileMap.getEntities(tileMap, tilePos);
                                     let blocking = entities.filter(entity => entity.hasComponent("blocking"));
-                                    if (blocking.length === 0 && !player.getComponent<Component.Flag>("moving").value) {
+                                    if (blocking.length === 0 && !player.getComponent<boolean>("moving").value) {
                                         let stateManager = parentScene.subSceneManager;
                                         stateManager.push("Build", parentScene);
                                     }

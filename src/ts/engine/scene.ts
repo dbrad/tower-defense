@@ -43,20 +43,20 @@ namespace Engine {
                 entities.forEach(
                     (entity) => {
                         if (entity.hasComponent("tileMap")) {
-                            let tileMap = entity.getComponent<ECS.Component.Object<TileMap>>("tileMap").value;
+                            let tileMap = entity.getComponent<TileMap>("tileMap").value;
                             Gfx.TileMap.draw(gl, camera, tileMap);
                         } else if (entity.hasComponent("sprite")) {
-                            let sprite = entity.getComponent<Component.Object<Gfx.Sprite>>("sprite").value;
-                            let renderPos = entity.getComponent<Component.Position>("renderPos").value;
+                            let sprite = entity.getComponent<Gfx.Sprite>("sprite").value;
+                            let renderPos = entity.getComponent<V2>("renderPos").value;
                             Gfx.Sprite.draw(gl, sprite, renderPos, camera.position);
                         } else if (entity.hasComponent("text")) {
-                            let data = entity.getComponent<Component.Object<Gfx.Text.Data>>("text").value;
-                            let renderPos = entity.getComponent<Component.Position>("renderPos").value;
+                            let data = entity.getComponent<Gfx.Text.Data>("text").value;
+                            let renderPos = entity.getComponent<V2>("renderPos").value;
                             gl.col = data.colour;
                             Gfx.Text.draw(gl, data.text, renderPos, data.textAlign, data.wrapWidth);
                         } else if (entity.hasComponent("9patch")) {
-                            let data = entity.getComponent<Component.Object<Gfx.NinePatch.Data>>("9patch").value;
-                            let tilePos = entity.getComponent<Component.Position>("tilePos").value;
+                            let data = entity.getComponent<Gfx.NinePatch.Data>("9patch").value;
+                            let tilePos = entity.getComponent<V2>("tilePos").value;
                             gl.col = data.colour;
                             Gfx.NinePatch.draw(gl, Gfx.NinePatchStore[data.name], tilePos.x, tilePos.y, data.tileSize.x, data.tileSize.y);
                         }

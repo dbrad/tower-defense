@@ -46,8 +46,8 @@ namespace Scenes {
                     (entity, collection, event) => {
                         collection.sort(
                             (entityA: ECS.Entity, entityB: ECS.Entity): number => {
-                                let sortA = ECS.Component.coalesceValue(entityA.getComponent<ECS.Component.Number>("sort"), 0);
-                                let sortB = ECS.Component.coalesceValue(entityB.getComponent<ECS.Component.Number>("sort"), 0);
+                                let sortA = ECS.Component.coalesceValue(entityA.getComponent<number>("sort"), 0);
+                                let sortB = ECS.Component.coalesceValue(entityB.getComponent<number>("sort"), 0);
                                 return sortA - sortB;
                             });
                     });
@@ -65,108 +65,65 @@ namespace Scenes {
 
                 let tileMapEntity = ecs.addEntity();
                 {
-                    tileMapEntity.addComponent(new Component.Tag("levelMap"));
-                    tileMapEntity.addComponent(new Component.Object("tileMap", tileMap));
-                    tileMapEntity.addComponent(new Component.Number("sort", 1));
-                    tileMapEntity.addComponent(new Component.Tag("renderable"));
+                    tileMapEntity.addTag("levelMap");
+                    tileMapEntity.addComponent<Engine.TileMap>("tileMap", tileMap);
+                    tileMapEntity.addComponent("sort", 1);
+                    tileMapEntity.addTag("renderable");
                 }
 
                 {
                     let ninePatch = ecs.addEntity();
-                    ninePatch.addComponent(new Component.Position("tilePos", { x: 24, y: 0 }));
-                    ninePatch.addComponent(
-                        new Component.Object<Gfx.NinePatch.Data>("9patch",
-                            {
-                                name: "dialog",
-                                colour: 0xFFFF8888,
-                                tileSize: { x: 8, y: 18 }
-                            }));
-                    ninePatch.addComponent(new Component.Number("sort", 9));
-                    ninePatch.addComponent(new Component.Tag("renderable"));
+                    ninePatch.addComponent<V2>("tilePos", { x: 24, y: 0 });
+                    ninePatch.addComponent<Gfx.NinePatch.Data>(
+                        "9patch",
+                        {
+                            name: "dialog",
+                            colour: 0xFFFF8888,
+                            tileSize: { x: 8, y: 18 }
+                        });
+                    ninePatch.addComponent("sort", 9);
+                    ninePatch.addTag("renderable");
                 }
 
                 let player = ecs.addEntity();
                 {
-                    player.addComponent(new Component.Tag("player"));
-                    let tilePos = player.addComponent(new Component.Position("tilePos", { x: 1, y: 1 }));
-                    player.addComponent(new Component.Position("renderPos", TileToPixel(tilePos.value, tileMap.tileSize)));
-                    player.addComponent(new Component.Position("targetTile", CopyV2(tilePos.value)));
-                    player.addComponent(new Component.Flag("moving", false));
-                    player.addComponent(new Component.Flag("movingLeft", false));
-                    player.addComponent(new Component.Flag("movingRight", false));
-                    player.addComponent(new Component.Flag("movingUp", false));
-                    player.addComponent(new Component.Flag("movingDown", false));
+                    player.addTag("player");
+                    let tilePos = player.addComponent<V2>("tilePos", { x: 1, y: 1 });
+                    player.addComponent<V2>("renderPos", TileToPixel(tilePos.value, tileMap.tileSize));
+                    player.addComponent<V2>("targetTile", CopyV2(tilePos.value));
+                    player.addComponent("moving", false);
+                    player.addComponent("movingLeft", false);
+                    player.addComponent("movingRight", false);
+                    player.addComponent("movingUp", false);
+                    player.addComponent("movingDown", false);
                     {
                         let sprite: Gfx.Sprite = Gfx.SpriteStore["cursor"].clone();
                         sprite.play("blink", true);
                         sprite.setColour(0xFF00FF00);
-                        player.addComponent(new Component.Object("sprite", sprite));
+                        player.addComponent("sprite", sprite);
                     }
-                    player.addComponent(new Component.Number("sort", 2));
-                    player.addComponent(new Component.Tag("renderable"));
+                    player.addComponent("sort", 2);
+                    player.addTag("renderable");
                     E.TileMap.mapEntity(player, tileMap, tilePos.value);
                 }
 
                 let spawner = ecs.addEntity();
                 {
-                    spawner.addComponent(new Component.Tag("blocking"));
-                    let tilePos = spawner.addComponent(new Component.Position("tilePos", { x: 1, y: 1 }));
-                    spawner.addComponent(new Component.Position("renderPos", TileToPixel(tilePos.value, tileMap.tileSize)));
-                    spawner.addComponent(new Component.Position("targetTile", CopyV2(tilePos.value)));
+                    spawner.addTag("blocking");
+                    let tilePos = spawner.addComponent<V2>("tilePos", { x: 1, y: 1 });
+                    spawner.addComponent<V2>("renderPos", TileToPixel(tilePos.value, tileMap.tileSize));
+                    spawner.addComponent<V2>("targetTile", CopyV2(tilePos.value));
                     {
                         let sprite: Gfx.Sprite = Gfx.SpriteStore["spawner"].clone();
                         sprite.setColour(0xFF0000FF);
-                        spawner.addComponent(new Component.Object("sprite", sprite));
+                        spawner.addComponent("sprite", sprite);
                     }
-                    spawner.addComponent(new Component.Number("sort", 2));
-                    spawner.addComponent(new Component.Tag("renderable"));
+                    spawner.addComponent("sort", 2);
+                    spawner.addTag("renderable");
                     E.TileMap.mapEntity(spawner, tileMap, tilePos.value);
                 }
 
                 // 0xAABBGGRR
-                for (let i = 0; i < 10; i++) {
-                    let testCursor = ecs.addEntity();
-                    let tilePos = testCursor.addComponent(new Component.Position("tilePos", { x: -2, y: i + 1 }));
-                    testCursor.addComponent(new Component.Position("renderPos", TileToPixel(tilePos.value, tileMap.tileSize)));
-                    {
-                        let sprite: Gfx.Sprite = Gfx.SpriteStore["cursor"].clone();
-                        let col = colourToNumber(randomInt(50, 255), randomInt(50, 255), randomInt(50, 255), randomInt(175, 255));
-                        (i % 2 == 0) ? sprite.play("blink", true) : sprite.play("quick-blink", true);
-                        sprite.setColour(col);
-                        testCursor.addComponent(new Component.Object("sprite", sprite));
-                    }
-                    testCursor.addComponent(new Component.Number("sort", 3));
-                    testCursor.addComponent(new Component.Tag("renderable"));
-                }
-
-                for (let i = 0; i < 10; i++) {
-                    let testCursor = ecs.addEntity();
-                    let tilePos = testCursor.addComponent(new Component.Position("tilePos", { x: 1, y: i + 2 }));
-                    testCursor.addComponent(new Component.Position("renderPos", TileToPixel(tilePos.value, tileMap.tileSize)));
-                    {
-                        let sprite: Gfx.Sprite = Gfx.SpriteStore["arrow"].clone()
-                        sprite.setRotation(Math.PI);
-                        sprite.play("blink", true);
-                        testCursor.addComponent(new Component.Object("sprite", sprite));
-                    }
-                    testCursor.addComponent(new Component.Number("sort", 4));
-                    testCursor.addComponent(new Component.Tag("renderable"));
-                }
-
-                for (let i = 0; i < 10; i++) {
-                    let testCursor = ecs.addEntity();
-                    let tilePos = testCursor.addComponent(new Component.Position("tilePos", { x: i + 2, y: i + 2 }));
-                    testCursor.addComponent(new Component.Position("renderPos", TileToPixel(tilePos.value, tileMap.tileSize)));
-                    {
-                        let sprite: Gfx.Sprite = Gfx.SpriteStore["arrow_diag"].clone()
-                        sprite.setRotation(Math.PI);
-                        sprite.play("blink", true);
-                        testCursor.addComponent(new Component.Object("sprite", sprite));
-                    }
-                    testCursor.addComponent(new Component.Number("sort", 4));
-                    testCursor.addComponent(new Component.Tag("renderable"));
-                }
-
                 self.subSceneManager.register(SubScenes.Move);
                 self.subSceneManager.register(SubScenes.Build);
                 self.subSceneManager.register(SubScenes.Defend);
@@ -179,7 +136,7 @@ namespace Scenes {
                 let ecs = self.ecsManager;
 
                 let player = ecs.getFirst("player");
-                let tileMap = ecs.getFirst("levelMap").getComponent<ECS.Component.Object<E.TileMap>>("tileMap").value;
+                let tileMap = ecs.getFirst("levelMap").getComponent<E.TileMap>("tileMap").value;
                 let camera = Engine.Camera.current
                 let cameraGap = self.fetch<number>("cameraGap");
 
@@ -187,11 +144,11 @@ namespace Scenes {
 
                 let spriteEntities = ecs.getAll("sprite");
                 spriteEntities.forEach(entity => {
-                    let sprite = entity.getComponent<Component.Object<Gfx.Sprite>>("sprite").value;
+                    let sprite = entity.getComponent<Gfx.Sprite>("sprite").value;
                     sprite.update(now, delta);
                 });
 
-                let moving = player.getComponent<Component.Flag>("moving");
+                let moving = player.getComponent<boolean>("moving");
                 if (moving.value) {
                     System.handleCollision(player, tileMap);
                     if (moving.value) {
@@ -200,7 +157,7 @@ namespace Scenes {
                 }
 
                 if (!camera.moving) {
-                    let renderPos = player.getComponent<Component.Position>("renderPos").value;
+                    let renderPos = player.getComponent<V2>("renderPos").value;
                     let gapX = renderPos.x - (camera.position.x + ~~(camera.size.x / 2));
                     let gapY = renderPos.y - (camera.position.y + ~~(camera.size.y / 2));
                     if (gapX >= cameraGap || gapX <= -cameraGap || gapY >= cameraGap || gapY <= -cameraGap) {

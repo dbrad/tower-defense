@@ -33,49 +33,49 @@ namespace Scenes {
             let ecs = self.ecsManager;
             {
                 let ninePatch = ecs.addEntity();
-                ninePatch.addComponent(new Component.Position("tilePos", { x: 0, y: 0 }));
-                ninePatch.addComponent(
-                    new Component.Object<Gfx.NinePatch.Data>("9patch",
-                        {
-                            name: "dialog",
-                            colour: 0xFFFF0000,
-                            tileSize: { x: 32, y: 18 }
-                        }));
-                ninePatch.addComponent(new Component.Number("sort", 0));
-                ninePatch.addComponent(new Component.Tag("renderable"));
+                ninePatch.addComponent<V2>("tilePos", { x: 0, y: 0 });
+                ninePatch.addComponent<Gfx.NinePatch.Data>(
+                    "9patch",
+                    {
+                        name: "dialog",
+                        colour: 0xFFFF0000,
+                        tileSize: { x: 32, y: 18 }
+                    });
+                ninePatch.addComponent("sort", 0);
+                ninePatch.addTag("renderable");
             }
             {
                 let text = ecs.addEntity();
-                text.addComponent(new Component.Position("renderPos", { x: 16, y: 16 }));
-                text.addComponent(
-                    new Component.Object<Gfx.Text.Data>("text",
-                        {
-                            text: "Tower Defense",
-                            textAlign: Gfx.Text.Alignment.LEFT,
-                            wrapWidth: 0,
-                            colour: 0xFFFFFFFF
-                        }));
-                text.addComponent(new Component.Number("sort", 10));
-                text.addComponent(new Component.Tag("renderable"));
+                text.addComponent<V2>("renderPos", { x: 16, y: 16 });
+                text.addComponent<Gfx.Text.Data>(
+                    "text",
+                    {
+                        text: "Tower Defense",
+                        textAlign: Gfx.Text.Alignment.LEFT,
+                        wrapWidth: 0,
+                        colour: 0xFFFFFFFF
+                    });
+                text.addComponent("sort", 10);
+                text.addTag("renderable");
             }
 
             options.forEach((value, index, array) => {
                 let text = ecs.addEntity();
-                text.addComponent(new Component.Position("renderPos", { x: 32, y: hh + (16 * index) }));
+                text.addComponent<V2>("renderPos", { x: 32, y: hh + (16 * index) });
 
                 let initVal = value;
                 if (sel === index) { initVal = `(${initVal})`; }
-                let data = text.addComponent(
-                    new Component.Object<Gfx.Text.Data>("text",
-                        {
-                            text: initVal,
-                            textAlign: Gfx.Text.Alignment.LEFT,
-                            wrapWidth: 0,
-                            colour: 0xFFFFFFFF
-                        }));
+                let data = text.addComponent<Gfx.Text.Data>(
+                    "text",
+                    {
+                        text: initVal,
+                        textAlign: Gfx.Text.Alignment.LEFT,
+                        wrapWidth: 0,
+                        colour: 0xFFFFFFFF
+                    });
 
-                text.addComponent(new Component.Number("sort", 10));
-                text.addComponent(new Component.Tag("renderable"));
+                text.addComponent("sort", 10);
+                text.addTag("renderable");
 
                 Engine.Events.on(
                     self.eventManager,

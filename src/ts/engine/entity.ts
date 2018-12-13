@@ -5,67 +5,27 @@
 
 namespace Engine {
     export namespace ECS {
-        export interface Component {
+        export interface IComponent {
             name: string;
             active: boolean;
             value: any;
         }
 
+        export class Component<T> implements IComponent {
+            name: string;
+            active: boolean;
+            value: T;
+            constructor(name: string, value: T, active: boolean = true) {
+                this.name = name;
+                this.value = value;
+                this.active = active;
+            }
+        }
+
         export namespace Component {
             export type Collection = { [key: string]: Entity[] };
 
-            export class Position implements Component {
-                name: string;
-                active: boolean;
-                value: V2;
-                constructor(name: string, pos: V2, active: boolean = true) {
-                    this.name = name;
-                    this.value = pos;
-                    this.active = active;
-                }
-            }
-
-            export class Tag implements Component {
-                name: string;
-                active: boolean;
-                value: string;
-                constructor(tag: string) {
-                    this.name = tag;
-                    this.value = tag;
-                }
-            }
-
-            export class Flag implements Component {
-                name: string;
-                active: boolean;
-                value: boolean;
-                constructor(name: string, flag: boolean) {
-                    this.name = name;
-                    this.value = flag;
-                }
-            }
-
-            export class Number implements Component {
-                name: string;
-                active: boolean;
-                value: number;
-                constructor(name: string, value: number) {
-                    this.name = name;
-                    this.value = value;
-                }
-            }
-
-            export class Object<T> implements Component {
-                name: string;
-                active: boolean;
-                value: T;
-                constructor(name: string, object: T) {
-                    this.name = name;
-                    this.value = object;
-                }
-            }
-
-            export function coalesceValue<T extends Component, K>(component: T | null, ifNull: K): K {
+            export function coalesceValue<T>(component: Component<T>, ifNull: T): T {
                 if (component != null) {
                     return component.value;
                 }
@@ -75,7 +35,7 @@ namespace Engine {
 
         export class Entity {
             private static __id: number = 1;
-            private _components: { [key: string]: Component } = {};
+            private _components: { [key: string]: IComponent } = {};
             private _manager: Manager;
             public readonly id: number;
 
@@ -104,7 +64,7 @@ namespace Engine {
                 this._manager = null;
             }
 
-            private registerComponentWithManager(component: Component): void {
+            private registerComponentWithManager<T>(component: Component<T>): void {
                 if (this._manager.collections[component.name] == null) {
                     this._manager.collections[component.name] = [];
                 }
@@ -112,7 +72,9 @@ namespace Engine {
                 this._manager.emit(this, component.name, "added");
             }
 
-            public addComponent<T extends Component>(component: T): T {
+            public addComponent<T>(name: string, value: T): Component<T> {
+                let component = new Component<T>(name, value);
+
                 // @ifdef DEBUG
                 DEBUG.assert(this._components[component.name] == null,
                     `Cannot add component named "${component.name}" to Entity #${this.id} multiple times.`,
@@ -126,11 +88,22 @@ namespace Engine {
                 return component;
             }
 
-            public getComponent<T extends Component>(name: string): T {
+            public addTag(name: string): Component<string> {
+                return this.addComponent(name, name);
+            }
+
+            public getComponent<T>(name: string): Component<T> {
                 if (this._components[name] == null) {
                     return null;
                 }
-                return this._components[name] as T;
+                return this._components[name];
+            }
+
+            public getValue<T>(name: string): T {
+                if (this._components[name] == null) {
+                    return null;
+                }
+                return this._components[name].value as T;
             }
 
             public hasComponent(name: string): boolean {
