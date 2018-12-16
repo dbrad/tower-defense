@@ -28,7 +28,7 @@ namespace Engine {
                 let keyCode: number = event.which;
                 if (_isUp[keyCode]) {
                     // @ifdef DEBUG
-                    DEBUG.log(keyCode.toString());
+                    //DEBUG.log(keyCode.toString());
                     // @endif
                     if (_bindings[keyCode]) {
                         _bindings[keyCode].keyDown();

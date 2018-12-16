@@ -1,5 +1,18 @@
 {
-    "javascript.referencesCodeLens.enabled": true,
     "javascript.validate.enable": true,
-    "git.ignoreLimitWarning": true
+    "git.ignoreLimitWarning": true,
+    "tslint.alwaysShowRuleFailuresAsWarnings": true,
+    "tslint.alwaysShowStatus": true,
+    "tslint.autoFixOnSave": [
+        "object-literal-sort-keys",
+        "trailing-comma",
+        "semicolon",
+        "no-trailing-whitespace",
+        "eofline",
+        "max-line-length",
+        "prefer-const,"
+    ],
+    "editor.cursorBlinking": "phase",
+    "editor.wordWrap": "bounded",
+    "editor.wordWrapColumn": 120
 }

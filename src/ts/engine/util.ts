@@ -16,11 +16,14 @@ function PixelToTile(v2: V2, tileSize: number): V2 {
 }
 
 namespace V2 {
-    export function add(a: V2, b: V2) {
+    export function add(a: V2, b: V2): V2 {
         return { x: a.x + b.x, y: a.y + b.y };
     }
-    export function sub(a: V2, b: V2) {
+    export function sub(a: V2, b: V2): V2 {
         return { x: a.x - b.x, y: a.y - b.y };
+    }
+    export function equal(a: V2, b: V2): boolean {
+        return (a.x === b.x && a.y === b.y)
     }
 }
 

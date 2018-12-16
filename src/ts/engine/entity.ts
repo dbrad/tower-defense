@@ -12,9 +12,9 @@ namespace Engine {
         }
 
         export class Component<T> implements IComponent {
-            name: string;
-            active: boolean;
-            value: T;
+            public name: string;
+            public active: boolean;
+            public value: T;
             constructor(name: string, value: T, active: boolean = true) {
                 this.name = name;
                 this.value = value;
@@ -34,46 +34,47 @@ namespace Engine {
         }
 
         export class Entity {
+            // tslint:disable-next-line:
             private static __id: number = 1;
+            public readonly id: number;
             private _components: { [key: string]: IComponent } = {};
             private _manager: Manager;
-            public readonly id: number;
 
             constructor(manager?: Manager) {
                 this.id = Entity.__id++;
                 this._manager = manager || null;
             }
 
-            public SetManager(manager: Manager) {
+            public setManager(manager: Manager): void {
                 if (this._manager != null) {
-                    this.DetachManager();
+                    this.detachManager();
                 }
                 this._manager = manager;
-                for (let component in this._components) {
-                    this.registerComponentWithManager(this._components[component]);
+                for (const component in this._components) {
+                    if (this._components.hasOwnProperty(component)) {
+                        this.registerComponentWithManager(this._components[component]);
+                    }
                 }
             }
 
-            public DetachManager() {
-                for (let component in this._manager.collections) {
-                    let index = this._manager.collections[component].indexOf(this);
-                    if (index !== -1) {
-                        this._manager.collections[component].splice(index, 1);
+            public detachManager(): void {
+                if (this._manager) {
+                    for (const component in this._manager.collections) {
+                        if (this._manager.collections[component]) {
+                            const index = this._manager.collections[component].indexOf(this);
+                            if (index !== -1) {
+                                this._manager.collections[component].splice(index, 1);
+                            }
+                        }
                     }
+                    this._manager.entities[this.id] = null;
+                    delete this._manager.entities[this.id];
                 }
                 this._manager = null;
             }
 
-            private registerComponentWithManager<T>(component: Component<T>): void {
-                if (this._manager.collections[component.name] == null) {
-                    this._manager.collections[component.name] = [];
-                }
-                this._manager.collections[component.name].push(this);
-                this._manager.emit(this, component.name, "added");
-            }
-
             public addComponent<T>(name: string, value: T): Component<T> {
-                let component = new Component<T>(name, value);
+                const component = new Component<T>(name, value);
 
                 // @ifdef DEBUG
                 DEBUG.assert(this._components[component.name] == null,
@@ -86,6 +87,19 @@ namespace Engine {
                     this.registerComponentWithManager(component);
                 }
                 return component;
+            }
+
+            public removeComponent(name: string): void {
+                this._components[name] = null;
+                delete this._components[name];
+            }
+
+            public removeAllComponents(): void {
+                for (const component in this._components) {
+                    if (this._components[component]) {
+                        this.removeComponent(component);
+                    }
+                }
             }
 
             public addTag(name: string): Component<string> {
@@ -109,6 +123,14 @@ namespace Engine {
             public hasComponent(name: string): boolean {
                 return (this._components[name] != null);
             }
+
+            private registerComponentWithManager<T>(component: Component<T>): void {
+                if (this._manager.collections[component.name] == null) {
+                    this._manager.collections[component.name] = [];
+                }
+                this._manager.collections[component.name].push(this);
+                this._manager.emit(this, component.name, "added");
+            }
         }
 
         type Event = "added" | "removed";
@@ -116,10 +138,10 @@ namespace Engine {
 
         export class Manager {
             public collections: Component.Collection = {};
-            private _eventHandlers: { [key: string]: { [key: string]: EventHandler[] } } = {};
             public entities: Entity[] = [];
+            private _eventHandlers: { [key: string]: { [key: string]: EventHandler[] } } = {};
 
-            public reset() {
+            public reset(): void {
                 this.collections = {};
                 this._eventHandlers = {};
                 this.entities.length = 0;
@@ -129,15 +151,22 @@ namespace Engine {
                 if (entity == null) {
                     entity = new Entity(this);
                 } else {
-                    entity.SetManager(this);
+                    entity.setManager(this);
                 }
                 this.entities[entity.id] = entity;
                 return entity;
             }
 
+            public removeEntity(entity: Entity): void {
+                // NOTE: This does not clean up entities mapped to a tilemap.
+                entity.detachManager();
+                entity.removeAllComponents();
+            }
+
             public getAll(name: string): Entity[] {
-                if (this.collections[name])
-                    return this.collections[name];
+                if (this.collections[name]) {
+                    return Array.from(this.collections[name]);
+                }
                 return [];
             }
 

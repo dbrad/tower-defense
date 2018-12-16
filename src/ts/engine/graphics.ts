@@ -5,25 +5,25 @@
 namespace Engine {
     export namespace Graphics {
         export let SpriteStore: { [key: string]: Sprite } = {};
-        export let NinePatchStore: { [key: string]: NinePatch } = {}
+        export let NinePatchStore: { [key: string]: NinePatch } = {};
 
         export type FrameDef = {
             texture: string;
             colour?: number;
             duration: number;
-        }
+        };
 
         export type SpriteDef = {
             name: string;
             animations: { [key: string]: FrameDef[] };
-        }
+        };
 
         export type Frame = {
             texture: Assets.Texture;
             colour: number;
             duration: number;
             rotation?: number;
-        }
+        };
 
         namespace Frame {
             export function clone(frame: Frame): Frame {
@@ -92,7 +92,7 @@ namespace Engine {
 
             stop(): void {
                 this.animationQueue.length = 0;
-                this.animationQueue.push(this.animations["DEFAULT"])
+                this.animationQueue.push(this.animations["DEFAULT"]);
             }
 
             update(now: number, delta: number): void {
@@ -202,14 +202,14 @@ namespace Engine {
                     renderer: gl,
                     texture: sprite.currentFrame.texture,
                     position: V2.sub(position, cameraPosition),
-                    rotation: 0 || sprite.currentFrame.rotation
+                    rotation: 0 || sprite.currentFrame.rotation,
                 });
             }
 
             export function CreateAndStore(def: SpriteDef): Sprite {
                 let sprite: Sprite =
                     new Sprite(new Sprite.Animation([
-                        { texture: Assets.TextureStore[def.animations["DEFAULT"][0].texture], colour: def.animations["DEFAULT"][0].colour || 0xFFFFFFFF, duration: def.animations["DEFAULT"][0].duration }
+                        { texture: Assets.TextureStore[def.animations["DEFAULT"][0].texture], colour: def.animations["DEFAULT"][0].colour || 0xFFFFFFFF, duration: def.animations["DEFAULT"][0].duration },
                     ]));
 
                 for (let animationName in def.animations) {
@@ -243,7 +243,7 @@ namespace Engine {
                 name: string;
                 colour: number;
                 tileSize: V2;
-            }
+            };
             export function draw(gl: GL.Renderer, ninePatch: NinePatch, tileX: number, tileY: number, tileW: number, tileH: number) {
                 let s: Assets.Texture;
                 let endX = tileX + tileW - 1;
@@ -277,7 +277,7 @@ namespace Engine {
                         Texture.draw({
                             renderer: gl,
                             texture: s,
-                            position: { x: x * s.w, y: y * s.h }
+                            position: { x: x * s.w, y: y * s.h },
                         });
                     }
                 }
@@ -330,11 +330,11 @@ namespace Engine {
                 textAlign: Alignment;
                 colour: number;
                 wrapWidth: number;
-            }
+            };
             export enum Alignment {
                 LEFT,
                 CENTER,
-                RIGHT
+                RIGHT,
             }
 
             export function draw(gl: GL.Renderer, text: string, position: V2, textAlign: Alignment = Alignment.LEFT, wrap: number = 0): void {

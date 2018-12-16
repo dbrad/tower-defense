@@ -1,0 +1,20 @@
+{
+    "defaultSeverity": "error",
+    "extends": [
+        "tslint:recommended"
+    ],
+    "jsRules": {},
+    "rules": {
+        "no-reference": false,
+        "no-namespace": false,
+        "interface-over-type-literal": false,
+        "no-shadowed-variable": false,
+        "no-bitwise": false,
+        "max-classes-per-file": false,
+        "typedef": [true, "call-signature", "parameter"],
+        "variable-name": false,
+        "no-empty": false,
+        "no-string-literal": false
+    },
+    "rulesDirectory": []
+}

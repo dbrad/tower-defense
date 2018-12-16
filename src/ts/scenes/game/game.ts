@@ -21,7 +21,7 @@ namespace Scenes {
         import Gfx = E.Graphics;
         import Assets = E.Assets;
 
-        function makeMap(tileMap: Engine.TileMap) {
+        function makeMap(tileMap: Engine.TileMap): void {
             // Stubbed in TileMap
             for (let x = 0; x < tileMap.mapSize.x; x++) {
                 for (let y = 0; y < tileMap.mapSize.y; y++) {
@@ -38,15 +38,15 @@ namespace Scenes {
 
         export let scene = new E.Scene({
             name: "Game",
-            transitionIn() {
-                let self = this as E.Scene;
-                let ecs = self.ecsManager;
+            transitionIn(): void {
+                const self = this as E.Scene;
+                const ecs = self.ecsManager;
 
                 ecs.on("renderable", "added",
                     (entity, collection, event) => {
                         collection.sort(
                             (entityA: ECS.Entity, entityB: ECS.Entity): number => {
-                                let sortA = ECS.Component.coalesceValue(entityA.getComponent<number>("sort"), 0);
+                                const sortA = ECS.Component.coalesceValue(entityA.getComponent<number>("sort"), 0);
                                 let sortB = ECS.Component.coalesceValue(entityB.getComponent<number>("sort"), 0);
                                 return sortA - sortB;
                             });
@@ -55,11 +55,11 @@ namespace Scenes {
                 let tileMap: E.TileMap = {
                     mapSize: { x: 24, y: 24 },
                     tileSize: 16,
-                    tiles: []
+                    tiles: [],
                 };
 
                 self.attach("cameraGap", tileMap.tileSize * 7);
-                Engine.Camera.current = Engine.Camera.create({ x: 0, y: 0 }, { x: 24 * tileMap.tileSize, y: 18 * tileMap.tileSize })
+                Engine.Camera.current = Engine.Camera.create({ x: 0, y: 0 }, { x: 24 * tileMap.tileSize, y: 18 * tileMap.tileSize });
 
                 makeMap(tileMap);
 
@@ -79,7 +79,7 @@ namespace Scenes {
                         {
                             name: "dialog",
                             colour: 0xFFFF8888,
-                            tileSize: { x: 8, y: 18 }
+                            tileSize: { x: 8, y: 18 },
                         });
                     ninePatch.addComponent("sort", 9);
                     ninePatch.addTag("renderable");
@@ -118,7 +118,7 @@ namespace Scenes {
                         sprite.setColour(0xFF0000FF);
                         spawner.addComponent("sprite", sprite);
                     }
-                    spawner.addComponent("sort", 2);
+                    spawner.addComponent("sort", 3);
                     spawner.addTag("renderable");
                     E.TileMap.mapEntity(spawner, tileMap, tilePos.value);
                 }
@@ -129,7 +129,7 @@ namespace Scenes {
                 self.subSceneManager.register(SubScenes.Defend);
                 self.subSceneManager.push("Move", this);
             },
-            transitionOut() {
+            transitionOut(): void {
             },
             update(now: number, delta: number): void {
                 let self = this as E.Scene;
@@ -137,7 +137,7 @@ namespace Scenes {
 
                 let player = ecs.getFirst("player");
                 let tileMap = ecs.getFirst("levelMap").getComponent<E.TileMap>("tileMap").value;
-                let camera = Engine.Camera.current
+                let camera = Engine.Camera.current;
                 let cameraGap = self.fetch<number>("cameraGap");
 
                 System.handlePlayerInput(player);
@@ -169,7 +169,7 @@ namespace Scenes {
 
                 Engine.Camera.update(camera, now);
             },
-            render(gl: GL.Renderer, now: number, delta: number): void { }
+            render(gl: GL.Renderer, now: number, delta: number): void { },
         });
     }
 }
