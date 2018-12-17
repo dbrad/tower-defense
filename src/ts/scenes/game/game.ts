@@ -42,29 +42,34 @@ namespace Scenes {
                 const self = this as E.Scene;
                 const ecs = self.ecsManager;
 
+                //#region Entity Creation
                 ecs.on("renderable", "added",
                     (entity, collection, event) => {
                         collection.sort(
                             (entityA: ECS.Entity, entityB: ECS.Entity): number => {
                                 const sortA = ECS.Component.coalesceValue(entityA.getComponent<number>("sort"), 0);
-                                let sortB = ECS.Component.coalesceValue(entityB.getComponent<number>("sort"), 0);
+                                const sortB = ECS.Component.coalesceValue(entityB.getComponent<number>("sort"), 0);
                                 return sortA - sortB;
                             });
                     });
 
-                let tileMap: E.TileMap = {
-                    mapSize: { x: 24, y: 24 },
+                const tileMap: E.TileMap = {
+                    mapSize: { x: 25, y: 25 },
                     tileSize: 16,
                     tiles: [],
                 };
 
                 self.attach("cameraGap", tileMap.tileSize * 7);
-                Engine.Camera.current = Engine.Camera.create({ x: 0, y: 0 }, { x: 24 * tileMap.tileSize, y: 18 * tileMap.tileSize });
+                Engine.Camera.current =
+                    Engine.Camera.create(
+                        { x: 0, y: 0 },
+                        { x: 24 * tileMap.tileSize, y: 18 * tileMap.tileSize },
+                    );
 
                 makeMap(tileMap);
 
-                let tileMapEntity = ecs.addEntity();
                 {
+                    const tileMapEntity = ecs.addEntity();
                     tileMapEntity.addTag("levelMap");
                     tileMapEntity.addComponent<Engine.TileMap>("tileMap", tileMap);
                     tileMapEntity.addComponent("sort", 1);
@@ -72,49 +77,50 @@ namespace Scenes {
                 }
 
                 {
-                    let ninePatch = ecs.addEntity();
+                    const ninePatch = ecs.addEntity();
                     ninePatch.addComponent<V2>("tilePos", { x: 24, y: 0 });
                     ninePatch.addComponent<Gfx.NinePatch.Data>(
                         "9patch",
                         {
-                            name: "dialog",
                             colour: 0xFFFF8888,
+                            name: "dialog",
                             tileSize: { x: 8, y: 18 },
                         });
                     ninePatch.addComponent("sort", 9);
                     ninePatch.addTag("renderable");
                 }
 
-                let player = ecs.addEntity();
+                const cursor = ecs.addEntity();
                 {
-                    player.addTag("player");
-                    let tilePos = player.addComponent<V2>("tilePos", { x: 1, y: 1 });
-                    player.addComponent<V2>("renderPos", TileToPixel(tilePos.value, tileMap.tileSize));
-                    player.addComponent<V2>("targetTile", CopyV2(tilePos.value));
-                    player.addComponent("moving", false);
-                    player.addComponent("movingLeft", false);
-                    player.addComponent("movingRight", false);
-                    player.addComponent("movingUp", false);
-                    player.addComponent("movingDown", false);
+                    cursor.addTag("player");
+                    const tilePos = cursor.addComponent<V2>("tilePos", { x: 1, y: 1 });
+                    cursor.addComponent<V2>("renderPos", TileToPixel(tilePos.value, tileMap.tileSize));
+                    cursor.addComponent<V2>("targetTile", CopyV2(tilePos.value));
+                    cursor.addComponent("moving", false);
+                    cursor.addComponent("movingLeft", false);
+                    cursor.addComponent("movingRight", false);
+                    cursor.addComponent("movingUp", false);
+                    cursor.addComponent("movingDown", false);
                     {
-                        let sprite: Gfx.Sprite = Gfx.SpriteStore["cursor"].clone();
+                        const sprite: Gfx.Sprite = Gfx.SpriteStore["cursor"].clone();
                         sprite.play("blink", true);
                         sprite.setColour(0xFF00FF00);
-                        player.addComponent("sprite", sprite);
+                        cursor.addComponent("sprite", sprite);
                     }
-                    player.addComponent("sort", 2);
-                    player.addTag("renderable");
-                    E.TileMap.mapEntity(player, tileMap, tilePos.value);
+                    cursor.addComponent("sort", 2);
+                    cursor.addTag("renderable");
+                    E.TileMap.mapEntity(cursor, tileMap, tilePos.value);
                 }
 
-                let spawner = ecs.addEntity();
+                const spawner = ecs.addEntity();
                 {
-                    spawner.addTag("blocking");
-                    let tilePos = spawner.addComponent<V2>("tilePos", { x: 1, y: 1 });
+                    spawner.addTag("blockBuilding");
+                    spawner.addTag("spawnPoint");
+                    const tilePos = spawner.addComponent<V2>("tilePos", { x: 2, y: 1 });
                     spawner.addComponent<V2>("renderPos", TileToPixel(tilePos.value, tileMap.tileSize));
                     spawner.addComponent<V2>("targetTile", CopyV2(tilePos.value));
                     {
-                        let sprite: Gfx.Sprite = Gfx.SpriteStore["spawner"].clone();
+                        const sprite: Gfx.Sprite = Gfx.SpriteStore["spawner"].clone();
                         sprite.setColour(0xFF0000FF);
                         spawner.addComponent("sprite", sprite);
                     }
@@ -122,6 +128,37 @@ namespace Scenes {
                     spawner.addTag("renderable");
                     E.TileMap.mapEntity(spawner, tileMap, tilePos.value);
                 }
+
+                {
+                    const waypoint = EntityFactory.WayPoint({ x: 2, y: 12 }, tileMap, 1);
+                    waypoint.setManager(ecs);
+                }
+
+                {
+                    const waypoint = EntityFactory.WayPoint({ x: 22, y: 12 }, tileMap, 2);
+                    waypoint.setManager(ecs);
+                }
+
+                {
+                    const waypoint = EntityFactory.WayPoint({ x: 22, y: 2 }, tileMap, 3);
+                    waypoint.setManager(ecs);
+                }
+
+                {
+                    const waypoint = EntityFactory.WayPoint({ x: 12, y: 2 }, tileMap, 4);
+                    waypoint.setManager(ecs);
+                }
+
+                {
+                    const waypoint = EntityFactory.WayPoint({ x: 12, y: 22 }, tileMap, 5);
+                    waypoint.setManager(ecs);
+                }
+
+                {
+                    const endpoint = EntityFactory.EndPoint({ x: 23, y: 22 }, tileMap);
+                    endpoint.setManager(ecs);
+                }
+                //#endregion
 
                 // 0xAABBGGRR
                 self.subSceneManager.register(SubScenes.Move);
@@ -132,23 +169,23 @@ namespace Scenes {
             transitionOut(): void {
             },
             update(now: number, delta: number): void {
-                let self = this as E.Scene;
-                let ecs = self.ecsManager;
+                const self = this as E.Scene;
+                const ecs = self.ecsManager;
 
-                let player = ecs.getFirst("player");
-                let tileMap = ecs.getFirst("levelMap").getComponent<E.TileMap>("tileMap").value;
-                let camera = Engine.Camera.current;
-                let cameraGap = self.fetch<number>("cameraGap");
+                const player = ecs.getFirst("player");
+                const tileMap = ecs.getFirst("levelMap").getComponent<E.TileMap>("tileMap").value;
+                const camera = Engine.Camera.current;
+                const cameraGap = self.fetch<number>("cameraGap");
 
                 System.handlePlayerInput(player);
 
-                let spriteEntities = ecs.getAll("sprite");
-                spriteEntities.forEach(entity => {
-                    let sprite = entity.getComponent<Gfx.Sprite>("sprite").value;
+                const spriteEntities = ecs.getAll("sprite");
+                spriteEntities.forEach((entity) => {
+                    const sprite = entity.getComponent<Gfx.Sprite>("sprite").value;
                     sprite.update(now, delta);
                 });
 
-                let moving = player.getComponent<boolean>("moving");
+                const moving = player.getComponent<boolean>("moving");
                 if (moving.value) {
                     System.handleCollision(player, tileMap);
                     if (moving.value) {
@@ -157,12 +194,13 @@ namespace Scenes {
                 }
 
                 if (!camera.moving) {
-                    let renderPos = player.getComponent<V2>("renderPos").value;
-                    let gapX = renderPos.x - (camera.position.x + ~~(camera.size.x / 2));
-                    let gapY = renderPos.y - (camera.position.y + ~~(camera.size.y / 2));
-                    if (gapX >= cameraGap || gapX <= -cameraGap || gapY >= cameraGap || gapY <= -cameraGap) {
-                        let targetX = renderPos.x - ~~(camera.size.x / 2);
-                        let targetY = renderPos.y - ~~(camera.size.y / 2);
+                    const renderPos = player.getComponent<V2>("renderPos").value;
+                    const gapX = renderPos.x - (camera.position.x + ~~(camera.size.x / 2));
+                    const gapY = renderPos.y - (camera.position.y + ~~(camera.size.y / 2));
+                    if (gapX >= cameraGap || gapX <= -cameraGap ||
+                        gapY >= cameraGap || gapY <= -cameraGap) {
+                        const targetX = renderPos.x - ~~(camera.size.x / 2);
+                        const targetY = renderPos.y - ~~(camera.size.y / 2);
                         Engine.Camera.move(camera, { x: targetX, y: targetY }, now, 1200, Easing.outCubic);
                     }
                 }

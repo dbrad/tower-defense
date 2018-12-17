@@ -32,7 +32,7 @@ namespace Engine {
             };
             this.update = definition.update;
             this.render = (gl, now, delta) => {
-                let camera = Camera.current;
+                const camera = Camera.current;
 
                 gl.bkg(0, 0, 0);
                 gl.col = 0xFFFFFFFF;
@@ -67,7 +67,7 @@ namespace Engine {
                 if (this.subSceneManager.current) {
                     this.subSceneManager.current.render(gl, now, delta);
                 }
-            }
+            };
             this.name = definition.name;
         }
 

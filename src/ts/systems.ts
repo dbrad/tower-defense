@@ -10,13 +10,13 @@ namespace System {
     import Component = ECS.Component;
 
     export function handlePlayerInput(entity: ECS.Entity): void {
-        let tilePos = entity.getComponent<V2>("tilePos");
-        let targetTile = entity.getComponent<V2>("targetTile");
-        let moving = entity.getComponent<boolean>("moving");
-        let movingRight = entity.getComponent<boolean>("movingRight");
-        let movingLeft = entity.getComponent<boolean>("movingLeft");
-        let movingUp = entity.getComponent<boolean>("movingUp");
-        let movingDown = entity.getComponent<boolean>("movingDown");
+        const tilePos = entity.getComponent<V2>("tilePos");
+        const targetTile = entity.getComponent<V2>("targetTile");
+        const moving = entity.getComponent<boolean>("moving");
+        const movingRight = entity.getComponent<boolean>("movingRight");
+        const movingLeft = entity.getComponent<boolean>("movingLeft");
+        const movingUp = entity.getComponent<boolean>("movingUp");
+        const movingDown = entity.getComponent<boolean>("movingDown");
 
         // @ifdef DEBUG
         DEBUG.assert(tilePos != null, "Entity must have a 'tilePos' Position to move.");
@@ -28,7 +28,7 @@ namespace System {
         DEBUG.assert(movingDown != null, "Entity must have a 'movingDown' Flag to move.");
         // @endif
 
-        if (moving.value == false) {
+        if (moving.value === false) {
             if (movingRight.value) {
                 targetTile.value.x++;
             }
@@ -42,21 +42,21 @@ namespace System {
                 targetTile.value.y++;
             }
 
-            if (tilePos.value.x != targetTile.value.x ||
-                tilePos.value.y != targetTile.value.y) {
+            if (tilePos.value.x !== targetTile.value.x ||
+                tilePos.value.y !== targetTile.value.y) {
                 moving.value = true;
             }
         }
     }
 
     export function handleCollision(entity: ECS.Entity, tileMap: Engine.TileMap) {
-        let tilePos = entity.getComponent<V2>("tilePos");
-        let targetTile = entity.getComponent<V2>("targetTile");
-        let moving = entity.getComponent<boolean>("moving");
-        let movingRight = entity.getComponent<boolean>("movingRight");
-        let movingLeft = entity.getComponent<boolean>("movingLeft");
-        let movingUp = entity.getComponent<boolean>("movingUp");
-        let movingDown = entity.getComponent<boolean>("movingDown");
+        const tilePos = entity.getComponent<V2>("tilePos");
+        const targetTile = entity.getComponent<V2>("targetTile");
+        const moving = entity.getComponent<boolean>("moving");
+        const movingRight = entity.getComponent<boolean>("movingRight");
+        const movingLeft = entity.getComponent<boolean>("movingLeft");
+        const movingUp = entity.getComponent<boolean>("movingUp");
+        const movingDown = entity.getComponent<boolean>("movingDown");
 
         // @ifdef DEBUG
         DEBUG.assert(tilePos != null, "Entity must have a 'tilePos' Position to move.");

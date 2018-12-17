@@ -105,17 +105,65 @@ namespace Scenes.Game.SubScenes {
                             const player = parentScene.ecsManager.getFirst("player");
                             const position = player.getValue<V2>("tilePos");
 
-                            let cellMap = Engine.TileMap.convertToCellMap(tileMap);
-                            const index = position.x + (position.y * tileMap.mapSize.x);
-                            cellMap.cells[index] = null;
+                            //#region Pathing
+                            const spawnPoint = parentScene.ecsManager.getFirst("spawnPoint");
+                            const wayPoints = parentScene.ecsManager.getAll("waypoint");
+                            const endpoint = parentScene.ecsManager.getFirst("endpoint");
 
-                            let path = Engine.Pathing.generatePath(
-                                cellMap,
-                                { x: 1, y: 1 },
-                                { x: 20, y: 20 },
-                            );
+                            let path: V2[] = [];
+
+                            let from = spawnPoint;
+                            let to: ECS.Entity;
+                            for (const waypoint of wayPoints) {
+                                to = waypoint;
+
+                                const fromPos = from.getValue<V2>("tilePos");
+                                const toPos = to.getValue<V2>("tilePos");
+
+                                const cellMap = Engine.TileMap.convertToCellMap(tileMap);
+                                const index = position.x + (position.y * tileMap.mapSize.x);
+                                cellMap.cells[index] = null;
+
+                                const currentPath = Engine.Pathing.generatePath(
+                                    cellMap,
+                                    fromPos,
+                                    toPos,
+                                );
+
+                                if (currentPath.length === 0) {
+                                    path.length = 0;
+                                    break;
+                                } else {
+                                    path = path.concat(currentPath);
+                                    from = to;
+                                }
+                            }
 
                             if (path.length !== 0) {
+                                to = endpoint;
+
+                                const fromPos = from.getValue<V2>("tilePos");
+                                const toPos = to.getValue<V2>("tilePos");
+
+                                const cellMap = Engine.TileMap.convertToCellMap(tileMap);
+                                const index = position.x + (position.y * tileMap.mapSize.x);
+                                cellMap.cells[index] = null;
+
+                                const currentPath = Engine.Pathing.generatePath(
+                                    cellMap,
+                                    fromPos,
+                                    toPos,
+                                );
+                                if (currentPath.length === 0) {
+                                    path.length = 0;
+                                } else {
+                                    path = path.concat(currentPath);
+                                }
+                            }
+                            //#endregion
+
+                            if (path.length !== 0) {
+                                //#region Add Wall Entity
                                 const wall = parentScene.ecsManager.addEntity();
                                 wall.addTag("blockBuilding");
                                 wall.addTag("blockMovement");
@@ -132,7 +180,9 @@ namespace Scenes.Game.SubScenes {
                                 wall.addComponent("sort", 2);
                                 wall.addTag("renderable");
                                 Engine.TileMap.mapEntity(wall, tileMap, tilePos.value);
+                                //#endregion
 
+                                //#region Draw Pathing
                                 const pathing = parentScene.ecsManager.getAll("pathing");
 
                                 pathing.forEach((entity) => {
@@ -148,13 +198,14 @@ namespace Scenes.Game.SubScenes {
                                         TileToPixel(tilePos.value, tileMap.tileSize),
                                     );
                                     {
-                                        const sprite: Gfx.Sprite = Gfx.SpriteStore["spawner"].clone();
+                                        const sprite: Gfx.Sprite = Gfx.SpriteStore["arrow_diag"].clone();
                                         sprite.setColour(0xFFFF0000);
                                         path.addComponent("sprite", sprite);
                                     }
                                     path.addComponent("sort", 2);
                                     path.addTag("renderable");
                                 });
+                                //#endregion
                             }
 
                             parentScene.subSceneManager.pop(parentScene);
