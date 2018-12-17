@@ -8,6 +8,48 @@ namespace Scenes.Game.SubScenes {
     import ECS = Engine.ECS;
     import Component = ECS.Component;
     import Gfx = Engine.Graphics;
+
+    /*
+    arrow
+        0 = up (x: 0, y: -)
+        PI/2 = right (x: +, y: 0)
+        PI = down (x: 0, y: +)
+        1.5 PI = left (x: -, y: 0)
+
+    arrow_diag
+        0 = up-left (x: -, y: -)
+        PI/2 = up-right (x: +, y: -)
+        PI = down-right (x: +, y: +)
+        1.5 PI = down-left (x: -, y: +)
+    */
+    function getArrowRotation(v2: V2): number {
+        if (v2.x > 0) { // +x
+            if (v2.y > 0) { // +y
+                return Math.PI;
+            } else if (v2.y < 0) { // -y
+                return Math.PI / 2;
+            } else { // y === 0
+                return Math.PI / 2;
+            }
+        } else if (v2.x < 0) { // -x
+            if (v2.y > 0) { // +y
+                return Math.PI * 1.5;
+            } else if (v2.y < 0) { // -y
+                return 0;
+            } else { // y === 0
+                return Math.PI * 1.5;
+            }
+        } else { // x === 0
+            if (v2.y > 0) { // +y
+                return Math.PI;
+            } else if (v2.y < 0) { // -y
+                return 0;
+            } else { // y === 0
+                return 0;
+            }
+        }
+    }
+
     export let Build = new Engine.Scene({
         name: "Build",
         transitionIn(parentScene: Engine.Scene): void {
@@ -134,7 +176,7 @@ namespace Scenes.Game.SubScenes {
                                     path.length = 0;
                                     break;
                                 } else {
-                                    path = path.concat(currentPath);
+                                    path = path.concat(currentPath.slice(1));
                                     from = to;
                                 }
                             }
@@ -189,7 +231,14 @@ namespace Scenes.Game.SubScenes {
                                     parentScene.ecsManager.removeEntity(entity);
                                 });
 
-                                path.forEach((position) => {
+
+                                path.forEach((position, index, array) => {
+                                    if (index === array.length - 1) {
+                                        return;
+                                    }
+                                    const nextPosition = array[index + 1];
+                                    const directionV2 = V2.sub(nextPosition, position);
+                                    const rotation = getArrowRotation(directionV2);
                                     const path = parentScene.ecsManager.addEntity();
                                     path.addTag("pathing");
                                     const tilePos = path.addComponent<V2>("tilePos", CopyV2(position));
@@ -198,7 +247,14 @@ namespace Scenes.Game.SubScenes {
                                         TileToPixel(tilePos.value, tileMap.tileSize),
                                     );
                                     {
-                                        const sprite: Gfx.Sprite = Gfx.SpriteStore["arrow_diag"].clone();
+                                        let sprite: Gfx.Sprite;
+                                        if (directionV2.x !== 0 && directionV2.y !== 0) {
+                                            sprite = Gfx.SpriteStore["arrow_diag"].clone();
+                                        } else {
+                                            sprite = Gfx.SpriteStore["arrow"].clone();
+                                        }
+
+                                        sprite.setRotation(rotation);
                                         sprite.setColour(0xFFFF0000);
                                         path.addComponent("sprite", sprite);
                                     }

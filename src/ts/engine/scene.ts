@@ -50,13 +50,13 @@ namespace Engine {
                             let renderPos = entity.getComponent<V2>("renderPos").value;
                             Gfx.Sprite.draw(gl, sprite, renderPos, camera.position);
                         } else if (entity.hasComponent("text")) {
-                            let data = entity.getComponent<Gfx.Text.Data>("text").value;
-                            let renderPos = entity.getComponent<V2>("renderPos").value;
+                            const data = entity.getComponent<Gfx.Text.Data>("text").value;
+                            const renderPos = entity.getComponent<V2>("renderPos").value;
                             gl.col = data.colour;
                             Gfx.Text.draw(gl, data.text, renderPos, data.textAlign, data.wrapWidth);
                         } else if (entity.hasComponent("9patch")) {
-                            let data = entity.getComponent<Gfx.NinePatch.Data>("9patch").value;
-                            let tilePos = entity.getComponent<V2>("tilePos").value;
+                            const data = entity.getComponent<Gfx.NinePatch.Data>("9patch").value;
+                            const tilePos = entity.getComponent<V2>("tilePos").value;
                             gl.col = data.colour;
                             Gfx.NinePatch.draw(gl, Gfx.NinePatchStore[data.name], tilePos.x, tilePos.y, data.tileSize.x, data.tileSize.y);
                         }
@@ -73,9 +73,9 @@ namespace Engine {
 
         protected _storage: { [key: string]: any } = {};
         public attach<T>(name: string, object: T): T {
-            //@ifdef DEBUG
+            // @ifdef DEBUG
             DEBUG.assert(this._storage[name] == null, `${name} is already attached.`);
-            //@endif
+            // @endif
             this._storage[name] = object;
             return object;
         }

@@ -1,7 +1,7 @@
-interface V2 {
+type V2 = {
     x: number;
     y: number;
-}
+};
 
 function CopyV2(v2: V2): V2 {
     return { x: v2.x, y: v2.y };
@@ -23,32 +23,27 @@ namespace V2 {
         return { x: a.x - b.x, y: a.y - b.y };
     }
     export function equal(a: V2, b: V2): boolean {
-        return (a.x === b.x && a.y === b.y)
+        return (a.x === b.x && a.y === b.y);
     }
 }
 
-interface Position {
-    pixel: V2;
-    tile: V2;
-}
-
-interface V3 {
+type V3 = {
     x: number;
     y: number;
     z: number;
-}
+};
 
-interface Colour {
+type Colour = {
     r: number;
     g: number;
     b: number;
-}
+};
 
 function randomInt(min: number, max: number): number {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-function colourToNumber(r: number, g: number, b: number, a: number) {
+function colourToNumber(r: number, g: number, b: number, a: number): number {
     let out = 0x0;
     out = ((out | (a & 0xff)) << 8) >>> 0;
     out = ((out | (b & 0xff)) << 8) >>> 0;
@@ -66,8 +61,8 @@ namespace Bit {
         return bit_store &= ~(mask);
     }
 
-    export function set(bit_store: number, value: number, offset: number, mask: number) {
-        bit_store = clear(bit_store, mask)
+    export function set(bit_store: number, value: number, offset: number, mask: number): number {
+        bit_store = clear(bit_store, mask);
         return bit_store |= (value << offset);
     }
 }
@@ -75,59 +70,59 @@ namespace Bit {
 const Easing = {
     // no easing, no acceleration
     linear: function (t: number): number {
-        return t
+        return t;
     },
     // accelerating from zero velocity
     inQuad: function (t: number): number {
-        return t * t
+        return t * t;
     },
     // decelerating to zero velocity
     outQuad: function (t: number): number {
-        return t * (2 - t)
+        return t * (2 - t);
     },
     // acceleration until halfway, then deceleration
     inOutQuad: function (t: number): number {
-        return t < .5 ? 2 * t * t : -1 + (4 - 2 * t) * t
+        return t < .5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
     },
-    // accelerating from zero velocity 
+    // accelerating from zero velocity
     inCubic: function (t: number): number {
-        return t * t * t
+        return t * t * t;
     },
-    // decelerating to zero velocity 
+    // decelerating to zero velocity
     outCubic: function (t: number): number {
-        return (--t) * t * t + 1
+        return (--t) * t * t + 1;
     },
-    // acceleration until halfway, then deceleration 
+    // acceleration until halfway, then deceleration
     inOutCubic: function (t: number): number {
-        return t < .5 ? 4 * t * t * t : (t - 1) * (2 * t - 2) * (2 * t - 2) + 1
+        return t < .5 ? 4 * t * t * t : (t - 1) * (2 * t - 2) * (2 * t - 2) + 1;
     },
-    // accelerating from zero velocity 
+    // accelerating from zero velocity
     inQuart: function (t: number): number {
-        return t * t * t * t
+        return t * t * t * t;
     },
-    // decelerating to zero velocity 
+    // decelerating to zero velocity
     outQuart: function (t: number): number {
-        return 1 - (--t) * t * t * t
+        return 1 - (--t) * t * t * t;
     },
     // acceleration until halfway, then deceleration
     inOutQuart: function (t: number): number {
-        return t < .5 ? 8 * t * t * t * t : 1 - 8 * (--t) * t * t * t
+        return t < .5 ? 8 * t * t * t * t : 1 - 8 * (--t) * t * t * t;
     },
     // accelerating from zero velocity
     inQuint: function (t: number): number {
-        return t * t * t * t * t
+        return t * t * t * t * t;
     },
     // decelerating to zero velocity
     outQuint: function (t: number): number {
-        return 1 + (--t) * t * t * t * t
+        return 1 + (--t) * t * t * t * t;
     },
-    // acceleration until halfway, then deceleration 
+    // acceleration until halfway, then deceleration
     inOutQuint: function (t: number): number {
-        return t < .5 ? 16 * t * t * t * t * t : 1 + 16 * (--t) * t * t * t * t
-    }
-}
+        return t < .5 ? 16 * t * t * t * t * t : 1 + 16 * (--t) * t * t * t * t;
+    },
+};
 
-function* Interpolator(startTime: number, duration: number, easingFn: Function) {
+function* Interpolator(startTime: number, duration: number, easingFn: Function): any {
     let start = startTime;
     let now = startTime;
     let dur = duration;

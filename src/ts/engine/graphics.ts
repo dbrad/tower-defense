@@ -196,13 +196,18 @@ namespace Engine {
                 }
             }
 
-            export function draw(gl: GL.Renderer, sprite: Sprite, position: V2, cameraPosition: V2 = { x: 0, y: 0 }): void {
+            export function draw(
+                gl: GL.Renderer,
+                sprite: Sprite,
+                position: V2,
+                cameraPosition: V2 = { x: 0, y: 0 },
+            ): void {
                 gl.col = sprite.currentFrame.colour;
                 Texture.draw({
-                    renderer: gl,
-                    texture: sprite.currentFrame.texture,
                     position: V2.sub(position, cameraPosition),
+                    renderer: gl,
                     rotation: 0 || sprite.currentFrame.rotation,
+                    texture: sprite.currentFrame.texture,
                 });
             }
 
