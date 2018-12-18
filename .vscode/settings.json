@@ -14,5 +14,6 @@
     ],
     "editor.cursorBlinking": "phase",
     "editor.wordWrap": "bounded",
-    "editor.wordWrapColumn": 120
+    "editor.wordWrapColumn": 120,
+    "better-comments.highlightPlainText": true
 }

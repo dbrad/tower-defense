@@ -23,112 +23,124 @@ namespace Game {
             animations: {
                 "DEFAULT": [{
                     texture: "cursor",
-                    duration: 0
+                    duration: 0,
                 }],
                 "blink": [{
                     texture: "cursor_light",
-                    duration: 250
+                    duration: 250,
                 },
                 {
                     texture: "cursor",
-                    duration: 250
+                    duration: 250,
                 },
                 {
                     texture: "cursor_dark",
-                    duration: 250
+                    duration: 250,
                 },
                 {
                     texture: "cursor",
-                    duration: 250
+                    duration: 250,
                 }],
                 "quick-blink": [{
                     texture: "cursor_light",
-                    duration: 150
+                    duration: 150,
                 },
                 {
                     texture: "cursor",
-                    duration: 150
+                    duration: 150,
                 },
                 {
                     texture: "cursor_dark",
-                    duration: 150
+                    duration: 150,
                 },
                 {
                     texture: "cursor",
-                    duration: 150
+                    duration: 150,
                 }],
-            }
+            },
         },
         {
             name: "spawner",
             animations: {
                 "DEFAULT": [{
                     texture: "spawner",
-                    duration: 0
-                }]
-            }
+                    duration: 0,
+                }],
+            },
         },
         {
             name: "arrow",
             animations: {
                 "DEFAULT": [{
+                    colour: Colour.argb(0, 0, 0, 0),
+                    duration: 0,
                     texture: "arrow_cart",
-                    duration: 0
                 }],
                 "blink": [{
+                    colour: Colour.argb(50, 200, 55, 55),
+                    duration: 150,
                     texture: "arrow_cart",
-                    colour: 0xDD2222FF,
-                    duration: 350
                 },
                 {
+                    colour: Colour.argb(75, 200, 55, 55),
+                    duration: 150,
                     texture: "arrow_cart",
-                    colour: 0x992222FF,
-                    duration: 350
                 },
                 {
+                    colour: Colour.argb(100, 200, 55, 55),
+                    duration: 750,
                     texture: "arrow_cart",
-                    colour: 0x552222FF,
-                    duration: 350
                 },
                 {
+                    colour: Colour.argb(75, 200, 55, 55),
+                    duration: 150,
                     texture: "arrow_cart",
-                    colour: 0x992222FF,
-                    duration: 350
+                },
+                {
+                    colour: Colour.argb(50, 200, 55, 55),
+                    duration: 150,
+                    texture: "arrow_cart",
                 }],
-            }
+            },
         },
         {
             name: "arrow_diag",
             animations: {
                 "DEFAULT": [{
+                    colour: Colour.argb(0, 0, 0, 0),
+                    duration: 0,
                     texture: "arrow_diag",
-                    duration: 0
                 }],
                 "blink": [{
+                    colour: Colour.argb(50, 200, 55, 55),
+                    duration: 150,
                     texture: "arrow_diag",
-                    colour: 0x882222FF,
-                    duration: 350
                 },
                 {
+                    colour: Colour.argb(75, 200, 55, 55),
+                    duration: 150,
                     texture: "arrow_diag",
-                    colour: 0x662222FF,
-                    duration: 350
                 },
                 {
+                    colour: Colour.argb(100, 200, 55, 55),
+                    duration: 750,
                     texture: "arrow_diag",
-                    colour: 0x442222FF,
-                    duration: 350
                 },
                 {
+                    colour: Colour.argb(75, 200, 55, 55),
+                    duration: 150,
                     texture: "arrow_diag",
-                    colour: 0x662222FF,
-                    duration: 350
+                },
+                {
+                    colour: Colour.argb(50, 200, 55, 55),
+                    duration: 150,
+                    texture: "arrow_diag",
                 }],
-            }
-        }
+            },
+        },
     ];
     //#endregion
-    
+
     export interface GameState {
         version: string;
         wallPoints: number;
@@ -155,7 +167,7 @@ namespace Game {
             "north_wall",
             Assets.TextureStore['brick'],
             0xFF2d2d2d,
-            true
+            true,
         );
 
         // 0xAABBGGRR
@@ -163,21 +175,21 @@ namespace Game {
             "wall",
             Assets.TextureStore['brick'],
             0xFF2d2d2d,
-            true
+            true,
         );
 
         Engine.Tile.CreateAndStore(
             "floor",
             Assets.TextureStore['brick'],
             0xFF050505,
-            false
+            false,
         );
 
         let dialog: Gfx.NinePatch = {
             tl: Assets.TextureStore["dialog_tl"], tc: Assets.TextureStore["dialog_t"], tr: Assets.TextureStore["dialog_tr"],
             ml: Assets.TextureStore["dialog_ml"], mc: Assets.TextureStore["dialog_m"], mr: Assets.TextureStore["dialog_mr"],
-            bl: Assets.TextureStore["dialog_bl"], bc: Assets.TextureStore["dialog_b"], br: Assets.TextureStore["dialog_br"]
-        }
+            bl: Assets.TextureStore["dialog_bl"], bc: Assets.TextureStore["dialog_b"], br: Assets.TextureStore["dialog_br"],
+        };
 
         Gfx.NinePatchStore["dialog"] = dialog;
 

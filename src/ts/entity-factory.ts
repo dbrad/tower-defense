@@ -31,7 +31,7 @@ namespace EntityFactory {
         waypoint.addComponent<V2>("targetTile", CopyV2(tilePos.value));
         {
             const sprite: Gfx.Sprite = Gfx.SpriteStore["spawner"].clone();
-            sprite.setColour(0xFF663366);
+            sprite.setColourHex(0xFF663366);
             waypoint.addComponent("sprite", sprite);
         }
         waypoint.addComponent("sort", sort);
@@ -53,7 +53,7 @@ namespace EntityFactory {
         endpoint.addComponent<V2>("targetTile", CopyV2(tilePos.value));
         {
             const sprite: Gfx.Sprite = Gfx.SpriteStore["spawner"].clone();
-            sprite.setColour(0xFF336666);
+            sprite.setColourHex(0xFF336666);
             endpoint.addComponent("sprite", sprite);
         }
         endpoint.addComponent("sort", sort);

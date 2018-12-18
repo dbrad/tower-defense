@@ -199,7 +199,7 @@ namespace Scenes.Game.SubScenes {
                                 if (currentPath.length === 0) {
                                     path.length = 0;
                                 } else {
-                                    path = path.concat(currentPath);
+                                    path = path.concat(currentPath.slice(1));
                                 }
                             }
                             //#endregion
@@ -216,7 +216,7 @@ namespace Scenes.Game.SubScenes {
                                 );
                                 {
                                     const sprite: Gfx.Sprite = Gfx.SpriteStore["spawner"].clone();
-                                    sprite.setColour(0xFF00FF00);
+                                    sprite.setColourHex(0xFF00FF00);
                                     wall.addComponent("sprite", sprite);
                                 }
                                 wall.addComponent("sort", 2);
@@ -225,12 +225,14 @@ namespace Scenes.Game.SubScenes {
                                 //#endregion
 
                                 //#region Draw Pathing
+                                // TODO(dbrad): this is temporary, replace this with 1 - 3 arrow entities that
+                                // TODO(dbrad): walk the path.
+
                                 const pathing = parentScene.ecsManager.getAll("pathing");
 
                                 pathing.forEach((entity) => {
                                     parentScene.ecsManager.removeEntity(entity);
                                 });
-
 
                                 path.forEach((position, index, array) => {
                                     if (index === array.length - 1) {
@@ -253,9 +255,8 @@ namespace Scenes.Game.SubScenes {
                                         } else {
                                             sprite = Gfx.SpriteStore["arrow"].clone();
                                         }
-
                                         sprite.setRotation(rotation);
-                                        sprite.setColour(0xFFFF0000);
+                                        sprite.delay(16 + index * 32).then("blink").next();
                                         path.addComponent("sprite", sprite);
                                     }
                                     path.addComponent("sort", 2);

@@ -37,19 +37,37 @@ type Colour = {
     r: number;
     g: number;
     b: number;
+    a: number;
 };
+
+namespace Colour {
+    export const WHITE: Colour = { a: 255, r: 255, g: 255, b: 255 };
+
+    export function argb(a: number, r: number, g: number, b: number): Colour {
+        return { a, r, g, b };
+    }
+}
 
 function randomInt(min: number, max: number): number {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-function colourToNumber(r: number, g: number, b: number, a: number): number {
+function colourToHex(colour: Colour): number {
     let out = 0x0;
-    out = ((out | (a & 0xff)) << 8) >>> 0;
-    out = ((out | (b & 0xff)) << 8) >>> 0;
-    out = ((out | (g & 0xff)) << 8) >>> 0;
-    out = ((out | (r & 0xff))) >>> 0;
+    out = ((out | (colour.a & 0xff)) << 8) >>> 0;
+    out = ((out | (colour.b & 0xff)) << 8) >>> 0;
+    out = ((out | (colour.g & 0xff)) << 8) >>> 0;
+    out = ((out | (colour.r & 0xff))) >>> 0;
     return out;
+}
+
+function hexToColour(colour: number): Colour {
+    colour >>>= 0;
+    const b = colour & 0xFF;
+    const g = (colour & 0xFF00) >>> 8;
+    const r = (colour & 0xFF0000) >>> 16;
+    const a = ((colour & 0xFF000000) >>> 24);
+    return { a, b, g, r };
 }
 
 namespace Bit {

@@ -1,6 +1,7 @@
 /// <reference path="./assets.ts" />
 /// <reference path="./tilemap.ts" />
 /// <reference path="./camera.ts" />
+/// <reference path="./util.ts" />
 
 namespace Engine {
     export namespace Graphics {
@@ -9,7 +10,7 @@ namespace Engine {
 
         export type FrameDef = {
             texture: string;
-            colour?: number;
+            colour?: Colour;
             duration: number;
         };
 
@@ -20,7 +21,7 @@ namespace Engine {
 
         export type Frame = {
             texture: Assets.Texture;
-            colour: number;
+            colour: Colour;
             duration: number;
             rotation?: number;
         };
@@ -42,13 +43,15 @@ namespace Engine {
         export class Sprite {
             private animations: { [key: string]: Sprite.Animation } = {};
             private animationQueue: Sprite.Animation[] = [];
+            private loopQueue: boolean = false;
+            private animationIndex: number = 0;
 
             constructor(baseAnimation: Sprite.Animation) {
                 this.animations["DEFAULT"] = baseAnimation;
-                this.play("DEFAULT");
+                this.play("DEFAULT", true);
             }
 
-            clone(): Sprite {
+            public clone(): Sprite {
                 let sprite = new Sprite(this.animations["DEFAULT"].clone());
                 for (let key in this.animations) {
                     sprite.addAnimation(key, this.animations[key].clone());
@@ -57,52 +60,77 @@ namespace Engine {
             }
 
             get currentAnimation(): Sprite.Animation {
-                return this.animationQueue[0];
+                return this.animationQueue[this.animationIndex];
             }
 
             get currentFrame(): Frame {
                 return this.currentAnimation.currentFrame;
             }
 
-            addAnimation(name: string, animation: Sprite.Animation): void {
+            public addAnimation(name: string, animation: Sprite.Animation): void {
                 this.animations[name] = animation;
             }
 
-            play(animationName: string, loop: boolean = false): Sprite {
+            public play(animationName: string, loop: boolean = false): Sprite {
                 this.animationQueue.length = 0;
-                let animation = this.animations[animationName].clone();
+                const animation = this.animations[animationName].clone();
                 animation.loop = loop;
                 this.animationQueue.push(animation);
                 return this;
             }
 
-            then(animationName: string, loop: boolean = false): Sprite {
-                let animation = this.animations[animationName].clone();
+            public delay(milliseconds: number): Sprite {
+                const delayFrame: Frame = {
+                    colour: Colour.argb(0, 0, 0, 0),
+                    duration: milliseconds,
+                    texture: null,
+                };
+                this.animationQueue.push(new Sprite.Animation([delayFrame]));
+                return this;
+            }
+
+            public then(animationName: string, loop: boolean = false): Sprite {
+                const animation = this.animations[animationName].clone();
                 animation.loop = loop;
                 this.animationQueue.push(animation);
                 return this;
             }
 
-            next(): void {
-                this.animationQueue.shift();
-                if (this.animationQueue.length === 0) {
-                    this.stop();
+            public loop(): void {
+                this.next();
+                this.loopQueue = true;
+            }
+
+            public next(): void {
+                if (this.loopQueue) {
+                    this.animationIndex++;
+                    if (this.animationIndex >= this.animationQueue.length) {
+                        this.animationIndex = 0;
+                    }
+                } else {
+
+                    this.animationQueue.shift();
+                    if (this.animationQueue.length === 0) {
+                        this.stop();
+                    }
                 }
             }
 
-            stop(): void {
+            public stop(): void {
                 this.animationQueue.length = 0;
+                this.animationIndex = 0;
+                this.loopQueue = false;
                 this.animationQueue.push(this.animations["DEFAULT"]);
             }
 
-            update(now: number, delta: number): void {
+            public update(now: number, delta: number): void {
                 if (this.currentAnimation.done) {
                     this.next();
                 }
                 this.currentAnimation.update(delta);
             }
 
-            setColour(colour: number): void {
+            public setColour(colour: Colour): void {
                 for (let key in this.animations) {
                     this.animations[key].setColour(colour);
                 }
@@ -112,7 +140,17 @@ namespace Engine {
                     });
             }
 
-            setRotation(radians: number): void {
+            public setColourHex(colour: number): void {
+                for (let key in this.animations) {
+                    this.animations[key].setColourHex(colour);
+                }
+                this.animationQueue.forEach(
+                    (animation) => {
+                        animation.setColourHex(colour);
+                    });
+            }
+
+            public setRotation(radians: number): void {
                 for (let key in this.animations) {
                     this.animations[key].setRotation(radians);
                 }
@@ -160,14 +198,14 @@ namespace Engine {
                     this.frames = frames;
                 }
 
-                clone(): Animation {
+                public clone(): Animation {
                     return new Animation(Frame.cloneArray(this.frames));
                 }
 
-                update(delta: number) {
+                public update(delta: number): void {
                     this.done = false;
                     if (this.duration === 0) {
-                        return this.frames[0];
+                        return;
                     } else {
                         this.progress += delta;
                         if (this.progress > this.duration) {
@@ -181,14 +219,21 @@ namespace Engine {
                     }
                 }
 
-                setColour(colour: number): void {
+                public setColour(colour: Colour): void {
                     this.frames.forEach(
                         (frame) => {
                             frame.colour = colour;
                         });
                 }
 
-                setRotation(radians: number): void {
+                public setColourHex(colour: number): void {
+                    this.frames.forEach(
+                        (frame) => {
+                            frame.colour = hexToColour(colour);
+                        });
+                }
+
+                public setRotation(radians: number): void {
                     this.frames.forEach(
                         (frame) => {
                             frame.rotation = radians;
@@ -202,28 +247,41 @@ namespace Engine {
                 position: V2,
                 cameraPosition: V2 = { x: 0, y: 0 },
             ): void {
-                gl.col = sprite.currentFrame.colour;
-                Texture.draw({
-                    position: V2.sub(position, cameraPosition),
-                    renderer: gl,
-                    rotation: 0 || sprite.currentFrame.rotation,
-                    texture: sprite.currentFrame.texture,
-                });
+                if (sprite.currentFrame.texture != null) {
+                    gl.col = colourToHex(sprite.currentFrame.colour);
+                    Texture.draw({
+                        position: V2.sub(position, cameraPosition),
+                        renderer: gl,
+                        rotation: 0 || sprite.currentFrame.rotation,
+                        texture: sprite.currentFrame.texture,
+                    });
+                }
             }
 
             export function CreateAndStore(def: SpriteDef): Sprite {
                 let sprite: Sprite =
                     new Sprite(new Sprite.Animation([
-                        { texture: Assets.TextureStore[def.animations["DEFAULT"][0].texture], colour: def.animations["DEFAULT"][0].colour || 0xFFFFFFFF, duration: def.animations["DEFAULT"][0].duration },
+                        {
+                            colour: def.animations["DEFAULT"][0].colour || Colour.WHITE,
+                            duration: def.animations["DEFAULT"][0].duration,
+                            texture: Assets.TextureStore[def.animations["DEFAULT"][0].texture],
+                        },
                     ]));
 
-                for (let animationName in def.animations) {
-                    let animation = def.animations[animationName];
-                    let frames: Frame[] = [];
-                    for (let frame of animation) {
-                        frames.push({ texture: Assets.TextureStore[frame.texture], colour: frame.colour || 0xFFFFFFFF, duration: frame.duration });
+                for (const animationName in def.animations) {
+                    if (def.animations[animationName]) {
+                        const animation = def.animations[animationName];
+                        const frames: Frame[] = [];
+                        for (const frame of animation) {
+                            frames.push(
+                                {
+                                    colour: frame.colour || Colour.WHITE,
+                                    duration: frame.duration,
+                                    texture: Assets.TextureStore[frame.texture],
+                                });
+                        }
+                        sprite.addAnimation(animationName, new Sprite.Animation(frames));
                     }
-                    sprite.addAnimation(animationName, new Sprite.Animation(frames));
                 }
 
                 SpriteStore[def.name] = sprite;
@@ -231,7 +289,7 @@ namespace Engine {
             }
         }
 
-        export interface NinePatch {
+        export type NinePatch = {
             tl: Assets.Texture;
             tc: Assets.Texture;
             tr: Assets.Texture;
@@ -241,7 +299,7 @@ namespace Engine {
             bl: Assets.Texture;
             bc: Assets.Texture;
             br: Assets.Texture;
-        }
+        };
 
         export namespace NinePatch {
             export type Data = {

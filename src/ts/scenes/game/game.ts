@@ -104,7 +104,7 @@ namespace Scenes {
                     {
                         const sprite: Gfx.Sprite = Gfx.SpriteStore["cursor"].clone();
                         sprite.play("blink", true);
-                        sprite.setColour(0xFF00FF00);
+                        sprite.setColourHex(0xFF00FF00);
                         cursor.addComponent("sprite", sprite);
                     }
                     cursor.addComponent("sort", 2);
@@ -121,7 +121,7 @@ namespace Scenes {
                     spawner.addComponent<V2>("targetTile", CopyV2(tilePos.value));
                     {
                         const sprite: Gfx.Sprite = Gfx.SpriteStore["spawner"].clone();
-                        sprite.setColour(0xFF0000FF);
+                        sprite.setColourHex(0xFF0000FF);
                         spawner.addComponent("sprite", sprite);
                     }
                     spawner.addComponent("sort", 3);
