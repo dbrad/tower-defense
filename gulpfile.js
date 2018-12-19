@@ -101,12 +101,12 @@ gulp.task('debug:serve', gulp.series('debug:build', function () {
 }));
 
 gulp.task("debug:watch", function () {
-    gulp.watch('src/*.html', ['debug:copy:html']);
-    gulp.watch('src/css/*.css', ['debug:copy:css']);
-    gulp.watch('src/res/*.*', ['debug:copy:res']);
-    gulp.watch('src/ts/**/*.ts', ['debug:build:js']);
+    gulp.watch('src/*.html', gulp.series('debug:copy:html'));
+    gulp.watch('src/css/*.css', gulp.series('debug:copy:css'));
+    gulp.watch('src/res/*.*', gulp.series('debug:copy:res'));
+    gulp.watch('src/ts/**/*.ts', gulp.series('debug:build:js'));
 });
 
-gulp.task("debug", gulp.series('debug:build', 'debug:serve', 'debug:watch'));
+gulp.task("debug", gulp.parallel('debug:serve', 'debug:watch'));
 
 //#endregion

@@ -14,12 +14,8 @@ namespace Scenes {
     export namespace Game {
         import E = Engine;
         import ECS = E.ECS;
-        import Component = ECS.Component;
-        import Core = E.Core;
         import GL = E.GL;
-        import Input = E.Input;
         import Gfx = E.Graphics;
-        import Assets = E.Assets;
 
         function makeMap(tileMap: Engine.TileMap): void {
             // Stubbed in TileMap

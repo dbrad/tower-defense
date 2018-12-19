@@ -2,6 +2,7 @@
 /// <reference path="../../engine/pathing.ts" />
 /// <reference path="../../engine/entity.ts" />
 /// <reference path="../../entity-factory.ts" />
+/// <reference path="../../systems/path-generator.ts" />
 
 namespace Scenes.Game.SubScenes {
     import Input = Engine.Input;
@@ -137,76 +138,36 @@ namespace Scenes.Game.SubScenes {
 
             Input.bindControl("ACTION",
                 () => {
-                    switch (options[sel]) {
-                        case "Build Wall":
-                            const tileMap =
-                                parentScene.ecsManager
-                                    .getFirst("levelMap")
-                                    .getValue<Engine.TileMap>("tileMap");
+                    if (options[sel] === "Close") {
+                        const stateManager = parentScene.subSceneManager;
+                        stateManager.pop(parentScene);
+                    } else {
+                        const tileMap =
+                            parentScene.ecsManager
+                                .getFirst("levelMap")
+                                .getValue<Engine.TileMap>("tileMap");
 
-                            const player = parentScene.ecsManager.getFirst("player");
-                            const position = player.getValue<V2>("tilePos");
+                        const player = parentScene.ecsManager.getFirst("player");
+                        const position = player.getValue<V2>("tilePos");
 
-                            //#region Pathing
-                            const spawnPoint = parentScene.ecsManager.getFirst("spawnPoint");
-                            const wayPoints = parentScene.ecsManager.getAll("waypoint");
-                            const endpoint = parentScene.ecsManager.getFirst("endpoint");
+                        const spawnPoint = parentScene.ecsManager.getFirst("spawnPoint");
+                        const wayPoints = parentScene.ecsManager.getAll("waypoint");
+                        const endpoint = parentScene.ecsManager.getFirst("endpoint");
 
-                            let path: V2[] = [];
+                        const path: V2[] =
+                            PathGenerator.testAndGenerate(
+                                spawnPoint,
+                                wayPoints,
+                                endpoint,
+                                tileMap,
+                                position,
+                            );
 
-                            let from = spawnPoint;
-                            let to: ECS.Entity;
-                            for (const waypoint of wayPoints) {
-                                to = waypoint;
+                        if (path.length !== 0) {
+                            if (options[sel] === "Build Wall") {
 
-                                const fromPos = from.getValue<V2>("tilePos");
-                                const toPos = to.getValue<V2>("tilePos");
-
-                                const cellMap = Engine.TileMap.convertToCellMap(tileMap);
-                                const index = position.x + (position.y * tileMap.mapSize.x);
-                                cellMap.cells[index] = null;
-
-                                const currentPath = Engine.Pathing.generatePath(
-                                    cellMap,
-                                    fromPos,
-                                    toPos,
-                                );
-
-                                if (currentPath.length === 0) {
-                                    path.length = 0;
-                                    break;
-                                } else {
-                                    path = path.concat(currentPath.slice(1));
-                                    from = to;
-                                }
-                            }
-
-                            if (path.length !== 0) {
-                                to = endpoint;
-
-                                const fromPos = from.getValue<V2>("tilePos");
-                                const toPos = to.getValue<V2>("tilePos");
-
-                                const cellMap = Engine.TileMap.convertToCellMap(tileMap);
-                                const index = position.x + (position.y * tileMap.mapSize.x);
-                                cellMap.cells[index] = null;
-
-                                const currentPath = Engine.Pathing.generatePath(
-                                    cellMap,
-                                    fromPos,
-                                    toPos,
-                                );
-                                if (currentPath.length === 0) {
-                                    path.length = 0;
-                                } else {
-                                    path = path.concat(currentPath.slice(1));
-                                }
-                            }
-                            //#endregion
-
-                            if (path.length !== 0) {
-                                //#region Add Wall Entity
                                 const wall = parentScene.ecsManager.addEntity();
+                                wall.addTag("wall");
                                 wall.addTag("blockBuilding");
                                 wall.addTag("blockMovement");
                                 const tilePos = wall.addComponent<V2>("tilePos", CopyV2(position));
@@ -222,64 +183,73 @@ namespace Scenes.Game.SubScenes {
                                 wall.addComponent("sort", 2);
                                 wall.addTag("renderable");
                                 Engine.TileMap.mapEntity(wall, tileMap, tilePos.value);
-                                //#endregion
 
-                                //#region Draw Pathing
-                                // TODO(dbrad): this is temporary, replace this with 1 - 3 arrow entities that
-                                // TODO(dbrad): walk the path.
+                            } else if (options[sel] === "Build Tower") {
 
-                                const pathing = parentScene.ecsManager.getAll("pathing");
+                                const tower = parentScene.ecsManager.addEntity();
+                                tower.addTag("tower");
+                                tower.addTag("blockBuilding");
+                                tower.addTag("blockMovement");
+                                const tilePos = tower.addComponent<V2>("tilePos", CopyV2(position));
+                                tower.addComponent<V2>(
+                                    "renderPos",
+                                    TileToPixel(tilePos.value, tileMap.tileSize),
+                                );
+                                {
+                                    const sprite: Gfx.Sprite = Gfx.SpriteStore["spawner"].clone();
+                                    sprite.setColourHex(0xFFFF0000);
+                                    tower.addComponent("sprite", sprite);
+                                }
+                                tower.addComponent("sort", 2);
+                                tower.addTag("renderable");
+                                Engine.TileMap.mapEntity(tower, tileMap, tilePos.value);
 
-                                pathing.forEach((entity) => {
-                                    parentScene.ecsManager.removeEntity(entity);
-                                });
-
-                                path.forEach((position, index, array) => {
-                                    if (index === array.length - 1) {
-                                        return;
-                                    }
-                                    const nextPosition = array[index + 1];
-                                    const directionV2 = V2.sub(nextPosition, position);
-                                    const rotation = getArrowRotation(directionV2);
-                                    const path = parentScene.ecsManager.addEntity();
-                                    path.addTag("pathing");
-                                    const tilePos = path.addComponent<V2>("tilePos", CopyV2(position));
-                                    path.addComponent<V2>(
-                                        "renderPos",
-                                        TileToPixel(tilePos.value, tileMap.tileSize),
-                                    );
-                                    {
-                                        let sprite: Gfx.Sprite;
-                                        if (directionV2.x !== 0 && directionV2.y !== 0) {
-                                            sprite = Gfx.SpriteStore["arrow_diag"].clone();
-                                        } else {
-                                            sprite = Gfx.SpriteStore["arrow"].clone();
-                                        }
-                                        sprite.setRotation(rotation);
-                                        sprite.delay(16 + index * 32).then("blink").next();
-                                        path.addComponent("sprite", sprite);
-                                    }
-                                    path.addComponent("sort", 2);
-                                    path.addTag("renderable");
-                                });
-                                //#endregion
                             }
-
-                            parentScene.subSceneManager.pop(parentScene);
-                            break;
-                        case "Build Tower":
-                            break;
-                        case "Close":
-                            const stateManager = parentScene.subSceneManager;
-                            stateManager.pop(parentScene);
-                            break;
+                        }
+                        parentScene.subSceneManager.pop(parentScene);
                     }
-                }, () => { });
+                });
 
+            // TODO(dbrad): this is temporary, replace this with 1 - 3 arrow entities that
+            // TODO(dbrad): walk the path.
+            /*
+            const pathing = parentScene.ecsManager.getAll("pathing");
+
+            pathing.forEach((entity) => {
+                parentScene.ecsManager.removeEntity(entity);
+            });
+
+            path.forEach((position, index, array) => {
+                if (index === array.length - 1) {
+                    return;
+                }
+                const nextPosition = array[index + 1];
+                const directionV2 = V2.sub(nextPosition, position);
+                const rotation = getArrowRotation(directionV2);
+                const path = parentScene.ecsManager.addEntity();
+                path.addTag("pathing");
+                const tilePos = path.addComponent<V2>("tilePos", CopyV2(position));
+                path.addComponent<V2>(
+                    "renderPos",
+                    TileToPixel(tilePos.value, tileMap.tileSize),
+                );
+                {
+                    let sprite: Gfx.Sprite;
+                    if (directionV2.x !== 0 && directionV2.y !== 0) {
+                        sprite = Gfx.SpriteStore["arrow_diag"].clone();
+                    } else {
+                        sprite = Gfx.SpriteStore["arrow"].clone();
+                    }
+                    sprite.setRotation(rotation);
+                    sprite.delay(16 + index * 32).then("blink").next();
+                    path.addComponent("sprite", sprite);
+                }
+                path.addComponent("sort", 2);
+                path.addTag("renderable");
+            });
+            */
             Input.bindControl("BACK",
-                () => {
-
-                },
+                () => { },
                 () => {
                     const stateManager = parentScene.subSceneManager;
                     stateManager.pop(parentScene);

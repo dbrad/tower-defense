@@ -49,7 +49,7 @@ namespace System {
         }
     }
 
-    export function handleCollision(entity: ECS.Entity, tileMap: Engine.TileMap) {
+    export function handleCollision(entity: ECS.Entity, tileMap: Engine.TileMap): void {
         const tilePos = entity.getComponent<V2>("tilePos");
         const targetTile = entity.getComponent<V2>("targetTile");
         const moving = entity.getComponent<boolean>("moving");
@@ -90,7 +90,7 @@ namespace System {
 
     let ECSStorage: { [key: number]: { [key: string]: any } } = {};
 
-    export function moveEntity(entity: ECS.Entity, tileMap: Engine.TileMap, now: number) {
+    export function moveEntity(entity: ECS.Entity, tileMap: Engine.TileMap, now: number): void {
         let tilePos = entity.getComponent<V2>("tilePos");
         let targetTile = entity.getComponent<V2>("targetTile");
         let renderPos = entity.getComponent<V2>("renderPos");
