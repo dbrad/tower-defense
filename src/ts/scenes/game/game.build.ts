@@ -210,8 +210,6 @@ namespace Scenes.Game.SubScenes {
                     }
                 });
 
-            // TODO(dbrad): this is temporary, replace this with 1 - 3 arrow entities that
-            // TODO(dbrad): walk the path.
             /*
             const pathing = parentScene.ecsManager.getAll("pathing");
 

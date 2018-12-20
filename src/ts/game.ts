@@ -185,6 +185,13 @@ namespace Game {
             false,
         );
 
+        Engine.Tile.CreateAndStore(
+            "path",
+            Assets.TextureStore['brick'],
+            0xFF151515,
+            false,
+        );
+
         let dialog: Gfx.NinePatch = {
             tl: Assets.TextureStore["dialog_tl"], tc: Assets.TextureStore["dialog_t"], tr: Assets.TextureStore["dialog_tr"],
             ml: Assets.TextureStore["dialog_ml"], mc: Assets.TextureStore["dialog_m"], mr: Assets.TextureStore["dialog_mr"],

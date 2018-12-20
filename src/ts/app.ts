@@ -21,19 +21,19 @@ namespace Game {
             sHeight: 5,
             textures: [
                 ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'],
-                ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '.', '!', '?', '#', '(', ')', '-', '^', '+', '=', '/', '\\', ':', ',', "'", '"']
-            ]
+                ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '.', '!', '?', '#', '(', ')', '-', '^', '+', '=', '/', '\\', ':', ',', "'", '"'],
+            ],
         },
         'tiles': {
             loc: 'res/test.png',
             sWidth: 16,
             sHeight: 16,
             textures: [
-                ['brick', 'cursor', 'cursor_dark', 'cursor_light'],
-                ['dialog_tl', 'dialog_t', 'dialog_tr', 'arrow_cart'],
-                ['dialog_ml', 'dialog_m', 'dialog_mr', 'arrow_diag'],
-                ['dialog_bl', 'dialog_b', 'dialog_br', 'spawner']
-            ]
+                ['brick', 'cursor', 'cursor_dark', 'cursor_light', 'spawner'],
+                ['dialog_tl', 'dialog_t', 'dialog_tr', 'arrow_cart', ''],
+                ['dialog_ml', 'dialog_m', 'dialog_mr', 'arrow_diag', ''],
+                ['dialog_bl', 'dialog_b', 'dialog_br', 'point', ''],
+            ],
         },
         'irreg': {
             loc: 'res/irreg.png',
@@ -43,9 +43,9 @@ namespace Game {
                     x: 0,
                     y: 0,
                     width: 32,
-                    height: 32
-                }
-            ]
+                    height: 32,
+                },
+            ],
         },
 
     };
@@ -90,7 +90,7 @@ namespace Game {
                 };
                 window.onfocus = () => {
                     Core.unpause();
-                }
+                };
                 Core.start();
                 Game.setup();
             });

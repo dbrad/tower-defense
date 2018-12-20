@@ -156,8 +156,23 @@ namespace Engine {
             if (tileMap.tiles[index] === undefined) {
                 tileMap.tiles[index] = 0;
             }
-            tileMap.tiles[index] |= tile.hasCollision ? 1 : 0;
-            tileMap.tiles[index] |= (tile.id << 1);
+            tileMap.tiles[index] = Bit.clear(tileMap.tiles[index], COLLISION_MASK);
+            tileMap.tiles[index] =
+                Bit.set(
+                    tileMap.tiles[index],
+                    tile.hasCollision ? 1 : 0,
+                    COLLISION_OFFSET,
+                    COLLISION_MASK,
+                );
+
+            tileMap.tiles[index] = Bit.clear(tileMap.tiles[index], TILE_ID_MASK);
+            tileMap.tiles[index] =
+                Bit.set(
+                    tileMap.tiles[index],
+                    tile.id,
+                    TILE_ID_OFFSET,
+                    TILE_ID_MASK,
+                );
         }
 
         export function getTile(tileMap: TileMap, position: V2): Tile {

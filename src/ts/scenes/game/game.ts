@@ -103,7 +103,7 @@ namespace Scenes {
                         sprite.setColourHex(0xFF00FF00);
                         cursor.addComponent("sprite", sprite);
                     }
-                    cursor.addComponent("sort", 2);
+                    cursor.addComponent("sort", 8);
                     cursor.addTag("renderable");
                     E.TileMap.mapEntity(cursor, tileMap, tilePos.value);
                 }
@@ -150,11 +150,16 @@ namespace Scenes {
                     waypoint.setManager(ecs);
                 }
 
-                {
-                    const endpoint = EntityFactory.EndPoint({ x: 23, y: 22 }, tileMap);
-                    endpoint.setManager(ecs);
-                }
+                const endpoint = EntityFactory.EndPoint({ x: 23, y: 22 }, tileMap);
+                endpoint.setManager(ecs);
                 //#endregion
+
+                const waypoints = ecs.getAll("waypoint");
+                const path = PathGenerator.generate(spawner, waypoints, endpoint, tileMap);
+
+                path.forEach((position) => {
+                    Engine.TileMap.addTile(tileMap, Engine.TileStorage["path"], position);
+                });
 
                 // 0xAABBGGRR
                 self.subSceneManager.register(SubScenes.Move);
