@@ -142,6 +142,18 @@ namespace Scenes.Game.SubScenes {
                         const stateManager = parentScene.subSceneManager;
                         stateManager.pop(parentScene);
                     } else {
+                        if (options[sel] === "Build Wall" &&
+                            TowerDefense.gameState.wallPoints <= 0) {
+                            // show $$ error
+                            parentScene.subSceneManager.pop(parentScene);
+                            return;
+                        } else if (options[sel] === "Build Tower" &&
+                            TowerDefense.gameState.towerPoints <= 0) {
+                            // show $$ error
+                            parentScene.subSceneManager.pop(parentScene);
+                            return;
+                        }
+
                         const tileMap =
                             parentScene.ecsManager
                                 .getFirst("levelMap")
@@ -184,6 +196,9 @@ namespace Scenes.Game.SubScenes {
                                 wall.addTag("renderable");
                                 Engine.TileMap.mapEntity(wall, tileMap, tilePos.value);
 
+                                TowerDefense.gameState.wallPoints -= 1;
+                                Engine.Events.emit(parentScene.eventManager, "wallPoints", "update", null);
+
                             } else if (options[sel] === "Build Tower") {
 
                                 const tower = parentScene.ecsManager.addEntity();
@@ -203,6 +218,9 @@ namespace Scenes.Game.SubScenes {
                                 tower.addComponent("sort", 2);
                                 tower.addTag("renderable");
                                 Engine.TileMap.mapEntity(tower, tileMap, tilePos.value);
+
+                                TowerDefense.gameState.towerPoints -= 1;
+                                Engine.Events.emit(parentScene.eventManager, "towerPoints", "update", null);
 
                             }
                         }

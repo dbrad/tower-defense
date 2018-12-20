@@ -11,7 +11,7 @@
 /// <reference path="scenes/debug/debug.ts" />
 // @endif
 
-namespace Game {
+namespace TowerDefense {
     import Core = Engine.Core;
     import Gfx = Engine.Graphics;
     import Assets = Engine.Assets;
@@ -141,12 +141,12 @@ namespace Game {
     ];
     //#endregion
 
-    export interface GameState {
+    export type GameState = {
         version: string;
         wallPoints: number;
         towerPoints: number;
         upgradePoint: number;
-    }
+    };
 
     export let gameState: GameState = null;
 
@@ -159,7 +159,7 @@ namespace Game {
         Core.addScene(Scenes.Game.scene);
         Core.addScene(Scenes.PostGame);
 
-        for (let sprite of spriteData) {
+        for (const sprite of spriteData) {
             Gfx.Sprite.CreateAndStore(sprite);
         }
 

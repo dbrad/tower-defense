@@ -50,7 +50,7 @@ namespace Scenes {
                     });
 
                 const tileMap: E.TileMap = {
-                    mapSize: { x: 25, y: 25 },
+                    mapSize: { x: 37, y: 37 },
                     tileSize: 16,
                     tiles: [],
                 };
@@ -112,7 +112,7 @@ namespace Scenes {
                 {
                     spawner.addTag("blockBuilding");
                     spawner.addTag("spawnPoint");
-                    const tilePos = spawner.addComponent<V2>("tilePos", { x: 2, y: 1 });
+                    const tilePos = spawner.addComponent<V2>("tilePos", { x: 5, y: 2 });
                     spawner.addComponent<V2>("renderPos", TileToPixel(tilePos.value, tileMap.tileSize));
                     spawner.addComponent<V2>("targetTile", CopyV2(tilePos.value));
                     {
@@ -125,32 +125,34 @@ namespace Scenes {
                     E.TileMap.mapEntity(spawner, tileMap, tilePos.value);
                 }
 
+                const full = tileMap.mapSize.y;
+                const half = Math.round(tileMap.mapSize.y / 2);
                 {
-                    const waypoint = EntityFactory.WayPoint({ x: 2, y: 12 }, tileMap, 1);
+                    const waypoint = EntityFactory.WayPoint({ x: 5, y: half }, tileMap, 1);
                     waypoint.setManager(ecs);
                 }
 
                 {
-                    const waypoint = EntityFactory.WayPoint({ x: 22, y: 12 }, tileMap, 2);
+                    const waypoint = EntityFactory.WayPoint({ x: full - 6, y: half }, tileMap, 2);
                     waypoint.setManager(ecs);
                 }
 
                 {
-                    const waypoint = EntityFactory.WayPoint({ x: 22, y: 2 }, tileMap, 3);
+                    const waypoint = EntityFactory.WayPoint({ x: full - 6, y: 5 }, tileMap, 3);
                     waypoint.setManager(ecs);
                 }
 
                 {
-                    const waypoint = EntityFactory.WayPoint({ x: 12, y: 2 }, tileMap, 4);
+                    const waypoint = EntityFactory.WayPoint({ x: half, y: 5 }, tileMap, 4);
                     waypoint.setManager(ecs);
                 }
 
                 {
-                    const waypoint = EntityFactory.WayPoint({ x: 12, y: 22 }, tileMap, 5);
+                    const waypoint = EntityFactory.WayPoint({ x: half, y: full - 6 }, tileMap, 5);
                     waypoint.setManager(ecs);
                 }
 
-                const endpoint = EntityFactory.EndPoint({ x: 23, y: 22 }, tileMap);
+                const endpoint = EntityFactory.EndPoint({ x: full - 3, y: full - 6 }, tileMap);
                 endpoint.setManager(ecs);
                 //#endregion
 
@@ -161,6 +163,52 @@ namespace Scenes {
                     Engine.TileMap.addTile(tileMap, Engine.TileStorage["path"], position);
                 });
 
+                TowerDefense.gameState.towerPoints = 1;
+                TowerDefense.gameState.wallPoints = 5;
+
+                {
+                    const wallPoints = EntityFactory.Text(
+                        { x: (24 * 16) + 8, y: Engine.Core.HEIGHT - 40 },
+                        {
+                            colour: 0xFFFFFFFF,
+                            text: ` Wall Pts: ${TowerDefense.gameState.wallPoints}`,
+                            textAlign: Gfx.Text.Alignment.LEFT,
+                            wrapWidth: 0,
+                        },
+                    );
+                    wallPoints.setManager(ecs);
+
+                    Engine.Events.on(
+                        self.eventManager,
+                        "wallPoints",
+                        "update",
+                        () => {
+                            const text = wallPoints.getComponent<Gfx.Text.Data>("text");
+                            text.value.text = ` Wall Pts: ${TowerDefense.gameState.wallPoints}`;
+                        });
+                }
+
+                {
+                    const towerPoints = EntityFactory.Text(
+                        { x: (24 * 16) + 8, y: Engine.Core.HEIGHT - 32 },
+                        {
+                            colour: 0xFFFFFFFF,
+                            text: `Tower Pts: ${TowerDefense.gameState.towerPoints}`,
+                            textAlign: Gfx.Text.Alignment.LEFT,
+                            wrapWidth: 0,
+                        },
+                    );
+                    towerPoints.setManager(ecs);
+
+                    Engine.Events.on(
+                        self.eventManager,
+                        "towerPoints",
+                        "update",
+                        () => {
+                            const text = towerPoints.getComponent<Gfx.Text.Data>("text");
+                            text.value.text = `Tower Pts: ${TowerDefense.gameState.towerPoints}`;
+                        });
+                }
                 // 0xAABBGGRR
                 self.subSceneManager.register(SubScenes.Move);
                 self.subSceneManager.register(SubScenes.Build);

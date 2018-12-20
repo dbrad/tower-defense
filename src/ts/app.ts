@@ -1,12 +1,12 @@
 /// <reference path="engine/core.ts" />
 /// <reference path="engine/assets.ts" />
 /// <reference path="engine/input.ts" />
-/// <reference path="game.ts" />
+/// <reference path="tower-defense.ts" />
 // @ifdef DEBUG
 /// <reference path="engine/stats.ts" />
 // @endif
 
-namespace Game {
+namespace TowerDefense {
     import Core = Engine.Core;
     import Input = Engine.Input;
     import Assets = Engine.Assets;
@@ -92,9 +92,9 @@ namespace Game {
                     Core.unpause();
                 };
                 Core.start();
-                Game.setup();
+                TowerDefense.setup();
             });
     }
 }
 
-window.onload = Game.onload;
+window.onload = TowerDefense.onload;

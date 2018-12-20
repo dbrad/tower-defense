@@ -1,4 +1,4 @@
-/// <reference path="../game.ts" />
+/// <reference path="../tower-defense.ts" />
 
 namespace SaveManager {
 
@@ -14,11 +14,11 @@ namespace SaveManager {
     }
 
     export function newGame(): void {
-        Game.gameState = initialGameState();
+        TowerDefense.gameState = initialGameState();
     }
 
     export function save(): void {
-        _storage.setItem("save", JSON.stringify(Game.gameState));
+        _storage.setItem("save", JSON.stringify(TowerDefense.gameState));
     }
 
     export function saveExists(): boolean {
@@ -28,17 +28,17 @@ namespace SaveManager {
 
     export function load(): void {
         var gameStateString: string = _storage.getItem("save");
-        Game.gameState = JSON.parse(gameStateString);
+        TowerDefense.gameState = JSON.parse(gameStateString);
     }
 
     //#region Game state initializer
-    function initialGameState(): Game.GameState {
-        let gameState: Game.GameState = {
+    function initialGameState(): TowerDefense.GameState {
+        let gameState: TowerDefense.GameState = {
             version: "0.0.0",
             wallPoints: 0,
             towerPoints: 0,
-            upgradePoint: 0
-        }
+            upgradePoint: 0,
+        };
         return gameState;
     }
     //#endregion
