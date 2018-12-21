@@ -138,6 +138,45 @@ namespace TowerDefense {
                 }],
             },
         },
+        {
+            name: "slime",
+            animations: {
+                "DEFAULT": [{
+                    colour: Colour.argb(255, 45, 215, 255),
+                    duration: 0,
+                    texture: "slime_rest",
+                }],
+                "jump": [{
+                    duration: 1500,
+                    texture: "slime_rest",
+                },
+                {
+                    duration: 150,
+                    texture: "slime_jump_end",
+                },
+                {
+                    duration: 100,
+                    texture: "slime_jump_1",
+                },
+                {
+                    duration: 150,
+                    texture: "slime_jump_2",
+                },
+                {
+                    duration: 100,
+                    texture: "slime_jump_1",
+                },
+                {
+                    duration: 100,
+                    texture: "slime_jump_3",
+                },
+                {
+                    duration: 125,
+                    texture: "slime_jump_end",
+                },
+],
+            },
+        },
     ];
     //#endregion
 

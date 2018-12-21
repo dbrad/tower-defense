@@ -125,6 +125,51 @@ namespace Scenes {
                     E.TileMap.mapEntity(spawner, tileMap, tilePos.value);
                 }
 
+                {
+                    const slime = ecs.addEntity();
+                    const tilePos = slime.addComponent<V2>("tilePos", { x: 5, y: 2 });
+                    slime.addComponent<V2>("renderPos", TileToPixel(tilePos.value, tileMap.tileSize));
+                    slime.addComponent<V2>("targetTile", CopyV2(tilePos.value));
+                    {
+                        const sprite: Gfx.Sprite = Gfx.SpriteStore["slime"].clone();
+                        slime.addComponent("sprite", sprite);
+                        sprite.setColour(Colour.argb(255, 45, 215, 255));
+                        sprite.delay(32).then("jump").loop();
+                    }
+                    slime.addComponent("sort", 4);
+                    slime.addTag("renderable");
+                }
+
+                {
+                    const slime = ecs.addEntity();
+                    const tilePos = slime.addComponent<V2>("tilePos", { x: 6, y: 2 });
+                    slime.addComponent<V2>("renderPos", TileToPixel(tilePos.value, tileMap.tileSize));
+                    slime.addComponent<V2>("targetTile", CopyV2(tilePos.value));
+                    {
+                        const sprite: Gfx.Sprite = Gfx.SpriteStore["slime"].clone();
+                        slime.addComponent("sprite", sprite);
+                        sprite.setColour(Colour.argb(255, 255, 255, 50));
+                        sprite.play("jump", true);
+                    }
+                    slime.addComponent("sort", 4);
+                    slime.addTag("renderable");
+                }
+
+                {
+                    const slime = ecs.addEntity();
+                    const tilePos = slime.addComponent<V2>("tilePos", { x: 4, y: 2 });
+                    slime.addComponent<V2>("renderPos", TileToPixel(tilePos.value, tileMap.tileSize));
+                    slime.addComponent<V2>("targetTile", CopyV2(tilePos.value));
+                    {
+                        const sprite: Gfx.Sprite = Gfx.SpriteStore["slime"].clone();
+                        slime.addComponent("sprite", sprite);
+                        sprite.setColour(Colour.argb(255, 255, 50, 50));
+                        sprite.play("jump", true);
+                    }
+                    slime.addComponent("sort", 4);
+                    slime.addTag("renderable");
+                }
+
                 const full = tileMap.mapSize.y;
                 const half = Math.round(tileMap.mapSize.y / 2);
                 {
@@ -209,6 +254,7 @@ namespace Scenes {
                             text.value.text = `Tower Pts: ${TowerDefense.gameState.towerPoints}`;
                         });
                 }
+
                 // 0xAABBGGRR
                 self.subSceneManager.register(SubScenes.Move);
                 self.subSceneManager.register(SubScenes.Build);

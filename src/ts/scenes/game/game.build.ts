@@ -91,18 +91,161 @@ namespace Scenes.Game.SubScenes {
             ecs.addEntity(instructionTextConfirm);
             //#endregion
 
-            const options: string[] = ["Build Wall", "Build Tower", "Close"];
+            type Option = {
+                text: string;
+                available: boolean;
+                action: () => void;
+            };
+
+            const options: Option[] =
+                [
+                    {
+                        action: () => { },
+                        available: false,
+                        text: "Build Wall",
+                    },
+                    {
+                        action: () => { },
+                        available: false,
+                        text: "Build Tower",
+                    },
+                    {
+                        action: () => {
+                            const stateManager = parentScene.subSceneManager;
+                            stateManager.pop(parentScene);
+                        },
+                        available: true,
+                        text: "Close",
+                    },
+                ];
+
+            if (TowerDefense.gameState.wallPoints !== 0) {
+                options[0].available = true;
+                options[0].action = () => {
+                    if (TowerDefense.gameState.wallPoints <= 0) {
+                        // show $$ error
+                        parentScene.subSceneManager.pop(parentScene);
+                        return;
+                    }
+
+                    const tileMap =
+                        parentScene.ecsManager
+                            .getFirst("levelMap")
+                            .getValue<Engine.TileMap>("tileMap");
+
+                    const player = parentScene.ecsManager.getFirst("player");
+                    const position = player.getValue<V2>("tilePos");
+
+                    const spawnPoint = parentScene.ecsManager.getFirst("spawnPoint");
+                    const wayPoints = parentScene.ecsManager.getAll("waypoint");
+                    const endpoint = parentScene.ecsManager.getFirst("endpoint");
+
+                    const path: V2[] =
+                        PathGenerator.testAndGenerate(
+                            spawnPoint,
+                            wayPoints,
+                            endpoint,
+                            tileMap,
+                            position,
+                        );
+
+                    if (path.length !== 0) {
+                        const wall = parentScene.ecsManager.addEntity();
+                        wall.addTag("wall");
+                        wall.addTag("blockBuilding");
+                        wall.addTag("blockMovement");
+                        const tilePos = wall.addComponent<V2>("tilePos", CopyV2(position));
+                        wall.addComponent<V2>(
+                            "renderPos",
+                            TileToPixel(tilePos.value, tileMap.tileSize),
+                        );
+                        {
+                            const sprite: Gfx.Sprite = Gfx.SpriteStore["spawner"].clone();
+                            sprite.setColourHex(0xFF00FF00);
+                            wall.addComponent("sprite", sprite);
+                        }
+                        wall.addComponent("sort", 2);
+                        wall.addTag("renderable");
+                        Engine.TileMap.mapEntity(wall, tileMap, tilePos.value);
+
+                        TowerDefense.gameState.wallPoints -= 1;
+                        Engine.Events.emit(parentScene.eventManager, "wallPoints", "update", null);
+                    }
+                };
+                parentScene.subSceneManager.pop(parentScene);
+            }
+
+            if (TowerDefense.gameState.towerPoints !== 0) {
+                options[1].available = true;
+                options[1].action = () => {
+                    if (TowerDefense.gameState.towerPoints <= 0) {
+                        // show $$ error
+                        parentScene.subSceneManager.pop(parentScene);
+                        return;
+                    }
+
+                    const tileMap =
+                        parentScene.ecsManager
+                            .getFirst("levelMap")
+                            .getValue<Engine.TileMap>("tileMap");
+
+                    const player = parentScene.ecsManager.getFirst("player");
+                    const position = player.getValue<V2>("tilePos");
+
+                    const spawnPoint = parentScene.ecsManager.getFirst("spawnPoint");
+                    const wayPoints = parentScene.ecsManager.getAll("waypoint");
+                    const endpoint = parentScene.ecsManager.getFirst("endpoint");
+
+                    const path: V2[] =
+                        PathGenerator.testAndGenerate(
+                            spawnPoint,
+                            wayPoints,
+                            endpoint,
+                            tileMap,
+                            position,
+                        );
+
+                    if (path.length !== 0) {
+                        const tower = parentScene.ecsManager.addEntity();
+                        tower.addTag("tower");
+                        tower.addTag("blockBuilding");
+                        tower.addTag("blockMovement");
+                        const tilePos = tower.addComponent<V2>("tilePos", CopyV2(position));
+                        tower.addComponent<V2>(
+                            "renderPos",
+                            TileToPixel(tilePos.value, tileMap.tileSize),
+                        );
+                        {
+                            const sprite: Gfx.Sprite = Gfx.SpriteStore["spawner"].clone();
+                            sprite.setColourHex(0xFFFF0000);
+                            tower.addComponent("sprite", sprite);
+                        }
+                        tower.addComponent("sort", 2);
+                        tower.addTag("renderable");
+                        Engine.TileMap.mapEntity(tower, tileMap, tilePos.value);
+
+                        TowerDefense.gameState.towerPoints -= 1;
+                        Engine.Events.emit(parentScene.eventManager, "towerPoints", "update", null);
+                    }
+                    parentScene.subSceneManager.pop(parentScene);
+                };
+            }
+
             let sel: number = 0;
-            options.forEach((value, index, array) => {
+            options.forEach((option, index, array) => {
                 const text = ecs.addEntity();
                 text.addComponent<V2>("renderPos", { x: 28 * 16, y: 32 + (16 * index) });
 
-                let initVal = value;
+                let initVal = option.text;
                 if (sel === index) { initVal = `(${initVal})`; }
+                let colour = 0xFF999999;
+                if (option.available) {
+                    colour = 0xFFFFFFFF;
+                }
                 const data = text.addComponent<Gfx.Text.Data>(
                     "text",
                     {
-                        colour: 0xFFFFFFFF,
+                        colour,
                         text: initVal,
                         textAlign: Gfx.Text.Alignment.CENTER,
                         wrapWidth: 0,
@@ -117,9 +260,9 @@ namespace Scenes.Game.SubScenes {
                     "change",
                     (selectedIndex) => {
                         if (index === selectedIndex) {
-                            data.value.text = `(${value})`;
+                            data.value.text = `(${option.text})`;
                         } else {
-                            data.value.text = value;
+                            data.value.text = option.text;
                         }
                     });
             });
@@ -138,93 +281,8 @@ namespace Scenes.Game.SubScenes {
 
             Input.bindControl("ACTION",
                 () => {
-                    if (options[sel] === "Close") {
-                        const stateManager = parentScene.subSceneManager;
-                        stateManager.pop(parentScene);
-                    } else {
-                        if (options[sel] === "Build Wall" &&
-                            TowerDefense.gameState.wallPoints <= 0) {
-                            // show $$ error
-                            parentScene.subSceneManager.pop(parentScene);
-                            return;
-                        } else if (options[sel] === "Build Tower" &&
-                            TowerDefense.gameState.towerPoints <= 0) {
-                            // show $$ error
-                            parentScene.subSceneManager.pop(parentScene);
-                            return;
-                        }
-
-                        const tileMap =
-                            parentScene.ecsManager
-                                .getFirst("levelMap")
-                                .getValue<Engine.TileMap>("tileMap");
-
-                        const player = parentScene.ecsManager.getFirst("player");
-                        const position = player.getValue<V2>("tilePos");
-
-                        const spawnPoint = parentScene.ecsManager.getFirst("spawnPoint");
-                        const wayPoints = parentScene.ecsManager.getAll("waypoint");
-                        const endpoint = parentScene.ecsManager.getFirst("endpoint");
-
-                        const path: V2[] =
-                            PathGenerator.testAndGenerate(
-                                spawnPoint,
-                                wayPoints,
-                                endpoint,
-                                tileMap,
-                                position,
-                            );
-
-                        if (path.length !== 0) {
-                            if (options[sel] === "Build Wall") {
-
-                                const wall = parentScene.ecsManager.addEntity();
-                                wall.addTag("wall");
-                                wall.addTag("blockBuilding");
-                                wall.addTag("blockMovement");
-                                const tilePos = wall.addComponent<V2>("tilePos", CopyV2(position));
-                                wall.addComponent<V2>(
-                                    "renderPos",
-                                    TileToPixel(tilePos.value, tileMap.tileSize),
-                                );
-                                {
-                                    const sprite: Gfx.Sprite = Gfx.SpriteStore["spawner"].clone();
-                                    sprite.setColourHex(0xFF00FF00);
-                                    wall.addComponent("sprite", sprite);
-                                }
-                                wall.addComponent("sort", 2);
-                                wall.addTag("renderable");
-                                Engine.TileMap.mapEntity(wall, tileMap, tilePos.value);
-
-                                TowerDefense.gameState.wallPoints -= 1;
-                                Engine.Events.emit(parentScene.eventManager, "wallPoints", "update", null);
-
-                            } else if (options[sel] === "Build Tower") {
-
-                                const tower = parentScene.ecsManager.addEntity();
-                                tower.addTag("tower");
-                                tower.addTag("blockBuilding");
-                                tower.addTag("blockMovement");
-                                const tilePos = tower.addComponent<V2>("tilePos", CopyV2(position));
-                                tower.addComponent<V2>(
-                                    "renderPos",
-                                    TileToPixel(tilePos.value, tileMap.tileSize),
-                                );
-                                {
-                                    const sprite: Gfx.Sprite = Gfx.SpriteStore["spawner"].clone();
-                                    sprite.setColourHex(0xFFFF0000);
-                                    tower.addComponent("sprite", sprite);
-                                }
-                                tower.addComponent("sort", 2);
-                                tower.addTag("renderable");
-                                Engine.TileMap.mapEntity(tower, tileMap, tilePos.value);
-
-                                TowerDefense.gameState.towerPoints -= 1;
-                                Engine.Events.emit(parentScene.eventManager, "towerPoints", "update", null);
-
-                            }
-                        }
-                        parentScene.subSceneManager.pop(parentScene);
+                    if (options[sel].available) {
+                        options[sel].action();
                     }
                 });
 
