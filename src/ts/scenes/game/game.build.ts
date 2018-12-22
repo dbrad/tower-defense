@@ -111,8 +111,7 @@ namespace Scenes.Game.SubScenes {
                     },
                     {
                         action: () => {
-                            const stateManager = parentScene.subSceneManager;
-                            stateManager.pop(parentScene);
+                            parentScene.subSceneManager.pop(parentScene);
                         },
                         available: true,
                         text: "Close",
@@ -123,7 +122,6 @@ namespace Scenes.Game.SubScenes {
                 options[0].available = true;
                 options[0].action = () => {
                     if (TowerDefense.gameState.wallPoints <= 0) {
-                        // show $$ error
                         parentScene.subSceneManager.pop(parentScene);
                         return;
                     }
@@ -160,8 +158,7 @@ namespace Scenes.Game.SubScenes {
                             TileToPixel(tilePos.value, tileMap.tileSize),
                         );
                         {
-                            const sprite: Gfx.Sprite = Gfx.SpriteStore["spawner"].clone();
-                            sprite.setColourHex(0xFF00FF00);
+                            const sprite: Gfx.Sprite = Gfx.SpriteStore["wall"].clone();
                             wall.addComponent("sprite", sprite);
                         }
                         wall.addComponent("sort", 2);
@@ -171,15 +168,14 @@ namespace Scenes.Game.SubScenes {
                         TowerDefense.gameState.wallPoints -= 1;
                         Engine.Events.emit(parentScene.eventManager, "wallPoints", "update", null);
                     }
+                    parentScene.subSceneManager.pop(parentScene);
                 };
-                parentScene.subSceneManager.pop(parentScene);
             }
 
             if (TowerDefense.gameState.towerPoints !== 0) {
                 options[1].available = true;
                 options[1].action = () => {
                     if (TowerDefense.gameState.towerPoints <= 0) {
-                        // show $$ error
                         parentScene.subSceneManager.pop(parentScene);
                         return;
                     }

@@ -100,7 +100,7 @@ namespace Scenes {
                     {
                         const sprite: Gfx.Sprite = Gfx.SpriteStore["cursor"].clone();
                         sprite.play("blink", true);
-                        sprite.setColourHex(0xFF00FF00);
+                        sprite.setColourHex(0xFFFFFFFF);
                         cursor.addComponent("sprite", sprite);
                     }
                     cursor.addComponent("sort", 8);
@@ -127,7 +127,7 @@ namespace Scenes {
 
                 {
                     const slime = ecs.addEntity();
-                    const tilePos = slime.addComponent<V2>("tilePos", { x: 5, y: 2 });
+                    const tilePos = slime.addComponent<V2>("tilePos", { x: 5, y: 1 });
                     slime.addComponent<V2>("renderPos", TileToPixel(tilePos.value, tileMap.tileSize));
                     slime.addComponent<V2>("targetTile", CopyV2(tilePos.value));
                     {

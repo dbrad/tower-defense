@@ -30,7 +30,7 @@ namespace TowerDefense {
             sHeight: 16,
             textures: [
                 ['brick', 'cursor', 'cursor_dark', 'cursor_light', 'spawner'],
-                ['dialog_tl', 'dialog_t', 'dialog_tr', 'arrow_cart', ''],
+                ['dialog_tl', 'dialog_t', 'dialog_tr', 'arrow_cart', 'wall'],
                 ['dialog_ml', 'dialog_m', 'dialog_mr', 'arrow_diag', ''],
                 ['dialog_bl', 'dialog_b', 'dialog_br', 'point', ''],
                 ['slime_rest', 'slime_jump_1', 'slime_jump_2', 'slime_jump_3', 'slime_jump_end'],

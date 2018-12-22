@@ -81,9 +81,9 @@ namespace Engine {
 
             public delay(milliseconds: number): Sprite {
                 const delayFrame: Frame = {
-                    colour: Colour.argb(0, 0, 0, 0),
+                    colour: this.animations["DEFAULT"].currentFrame.colour,
                     duration: milliseconds,
-                    texture: null,
+                    texture: this.animations["DEFAULT"].currentFrame.texture,
                 };
                 this.animationQueue.push(new Sprite.Animation([delayFrame]));
                 return this;

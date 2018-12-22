@@ -69,6 +69,15 @@ namespace TowerDefense {
             },
         },
         {
+            name: "wall",
+            animations: {
+                "DEFAULT": [{
+                    texture: "wall",
+                    duration: 0,
+                }],
+            },
+        },
+        {
             name: "arrow",
             animations: {
                 "DEFAULT": [{
@@ -142,7 +151,6 @@ namespace TowerDefense {
             name: "slime",
             animations: {
                 "DEFAULT": [{
-                    colour: Colour.argb(255, 45, 215, 255),
                     duration: 0,
                     texture: "slime_rest",
                 }],
@@ -220,14 +228,14 @@ namespace TowerDefense {
         Engine.Tile.CreateAndStore(
             "floor",
             Assets.TextureStore['brick'],
-            0xFF050505,
+            0xFF55ac55,
             false,
         );
 
         Engine.Tile.CreateAndStore(
             "path",
             Assets.TextureStore['brick'],
-            0xFF151515,
+            0xFF3d5c5c,
             false,
         );
 
