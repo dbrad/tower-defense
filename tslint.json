@@ -14,7 +14,9 @@
         "typedef": [true, "call-signature", "parameter"],
         "variable-name": false,
         "no-empty": false,
-        "no-string-literal": false
+        "no-string-literal": false,
+        "object-literal-sort-keys": false,
+        "max-line-length": false
     },
     "rulesDirectory": []
 }

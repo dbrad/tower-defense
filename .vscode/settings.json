@@ -13,7 +13,7 @@
         "prefer-const,"
     ],
     "editor.cursorBlinking": "phase",
-    "editor.wordWrap": "bounded",
-    "editor.wordWrapColumn": 120,
-    "better-comments.highlightPlainText": true
+    "editor.wordWrapColumn": 255,
+    "better-comments.highlightPlainText": true,
+    "standard.enable": false
 }

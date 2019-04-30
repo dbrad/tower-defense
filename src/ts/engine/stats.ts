@@ -15,7 +15,7 @@ namespace Engine {
         }
 
         export function tick(delta: number): void {
-            _fpsMs += delta
+            _fpsMs += delta;
             _fps++;
             if (_fpsMs >= 1000) {
                 _lastMs = _fpsMs / _fps;

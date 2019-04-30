@@ -14,67 +14,67 @@ namespace Scenes {
 
     export let SettingsMenu: E.Scene = new E.Scene({
         name: "SettingsMenu",
-        transitionIn() {
-            let self = this as E.Scene;
+        transitionIn(): void {
+            const self = this as E.Scene;
             let sel = 0;
-            let options: string[] = ["Back"];
+            const options: string[] = ["Back"];
 
-            let hh = ~~(Core.HEIGHT / 2);
-            let hw = ~~(Core.WIDTH / 2);
+            const hh = ~~(Core.HEIGHT / 2);
+            const hw = ~~(Core.WIDTH / 2);
 
-            let ecs = self.ecsManager;
+            const ecs = self.ecsManager;
             {
-                let ninePatch = ecs.addEntity();
+                const  ninePatch = ecs.addEntity();
                 ninePatch.addComponent<V2>("tilePos", { x: 0, y: 0 });
                 ninePatch.addComponent<Gfx.NinePatch.Data>(
                     "9patch",
                     {
                         name: "dialog",
                         colour: 0xFFFF0000,
-                        tileSize: { x: 32, y: 18 }
+                        tileSize: { x: 32, y: 18 },
                     });
                 ninePatch.addComponent("sort", 0);
                 ninePatch.addTag("renderable");
             }
             {
-                let text = ecs.addEntity();
-                text.addComponent<V2>("renderPos", { x: hw, y: 16 });
-                text.addComponent<Gfx.Text.Data>(
+                const textEntity = ecs.addEntity();
+                textEntity.addComponent<V2>("renderPos", { x: hw, y: 16 });
+                textEntity.addComponent<Gfx.Text.Data>(
                     "text",
                     {
                         text: "Settings",
                         textAlign: Gfx.Text.Alignment.CENTER,
                         wrapWidth: 0,
-                        colour: 0xFFFFFFFF
+                        colour: 0xFFFFFFFF,
                     });
-                text.addComponent("sort", 10);
-                text.addTag("renderable");
+                textEntity.addComponent("sort", 10);
+                textEntity.addTag("renderable");
             }
 
             options.forEach((value, index, array) => {
-                let text = ecs.addEntity();
-                text.addComponent<V2>("renderPos", { x: hw, y: hh + (16 * index) });
+                const textEntity = ecs.addEntity();
+                textEntity.addComponent<V2>("renderPos", { x: hw, y: hh + (16 * index) });
 
                 let initVal = value;
                 if (sel === index) { initVal = `(${initVal})`; }
-                let data = text.addComponent<Gfx.Text.Data>(
+                const data = textEntity.addComponent<Gfx.Text.Data>(
                     "text",
                     {
                         text: initVal,
                         textAlign: Gfx.Text.Alignment.CENTER,
                         wrapWidth: 0,
-                        colour: 0xFFFFFFFF
+                        colour: 0xFFFFFFFF,
                     });
 
-                text.addComponent("sort", 10);
-                text.addTag("renderable");
+                textEntity.addComponent("sort", 10);
+                textEntity.addTag("renderable");
 
                 Engine.Events.on(
                     self.eventManager,
                     "sel",
                     "change",
                     (selectedIndex) => {
-                        if (index == selectedIndex) {
+                        if (index === selectedIndex) {
                             data.value.text = `(${value})`;
                         } else {
                             data.value.text = value;
@@ -84,12 +84,12 @@ namespace Scenes {
 
             Input.bindControl("DOWN", () => {
                 sel += 1;
-                if (sel > options.length - 1) sel = 0;
+                if (sel > options.length - 1) { sel = 0; }
                 Engine.Events.emit(self.eventManager, "sel", "change", sel);
             });
             Input.bindControl("UP", () => {
                 sel -= 1;
-                if (sel < 0) sel = options.length - 1;
+                if (sel < 0) { sel = options.length - 1; }
                 Engine.Events.emit(self.eventManager, "sel", "change", sel);
             });
             Input.bindControl("ACTION", () => {
@@ -100,10 +100,10 @@ namespace Scenes {
                 }
             });
         },
-        transitionOut() {
+        transitionOut(): void {
             Input.unbindAll();
         },
         update(now: number, delta: number): void { },
-        render(gl: GL.Renderer, now: number, delta: number): void { }
+        render(gl: GL.Renderer, now: number, delta: number): void { },
     });
 }

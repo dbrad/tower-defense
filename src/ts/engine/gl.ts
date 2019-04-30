@@ -2,7 +2,7 @@
 
 namespace Engine {
     export namespace GL {
-        export interface Renderer {
+        export type Renderer = {
             gl: WebGLRenderingContext;
             canvas: HTMLCanvasElement;
             col: number;
@@ -15,34 +15,34 @@ namespace Engine {
             pop(): void;
             img(texture: WebGLTexture, x: number, y: number, width: number, height: number, u0: number, v0: number, u1: number, v1: number, light?: V3): void;
             flush(): void;
-        }
+        };
 
-        export function CompileShader(gl: WebGLRenderingContext, source: string, type: number) {
-            var shader = gl.createShader(type);
+        export function CompileShader(gl: WebGLRenderingContext, source: string, type: number): WebGLShader {
+            const shader = gl.createShader(type);
             gl.shaderSource(shader, source);
             gl.compileShader(shader);
             return shader;
         }
 
-        export function CreateShaderProgram(gl: WebGLRenderingContext, vsSource: string, fsSource: string) {
-            var program = gl.createProgram(),
-                vShader = CompileShader(gl, vsSource, 35633),
-                fShader = CompileShader(gl, fsSource, 35632);
+        export function CreateShaderProgram(gl: WebGLRenderingContext, vsSource: string, fsSource: string): WebGLProgram {
+            const program = gl.createProgram();
+            const vShader = CompileShader(gl, vsSource, 35633);
+            const fShader = CompileShader(gl, fsSource, 35632);
             gl.attachShader(program, vShader);
             gl.attachShader(program, fShader);
             gl.linkProgram(program);
             return program;
         }
 
-        export function CreateBuffer(gl: WebGLRenderingContext, bufferType: number, size: number, usage: number) {
-            var buffer = gl.createBuffer();
+        export function CreateBuffer(gl: WebGLRenderingContext, bufferType: number, size: number, usage: number): WebGLBuffer {
+            const buffer = gl.createBuffer();
             gl.bindBuffer(bufferType, buffer);
             gl.bufferData(bufferType, size, usage);
             return buffer;
         }
 
-        export function CreateTexture(gl: WebGLRenderingContext, image: HTMLImageElement, width: number, height: number) {
-            var texture = gl.createTexture();
+        export function CreateTexture(gl: WebGLRenderingContext, image: HTMLImageElement, width: number, height: number): WebGLTexture {
+            const texture = gl.createTexture();
             gl.bindTexture(3553, texture);
             gl.texParameteri(3553, 10242, 33071);
             gl.texParameteri(3553, 10243, 33071);
@@ -53,6 +53,7 @@ namespace Engine {
             return texture;
         }
 
+        // tslint:disable all
         export function Renderer(canvas: HTMLCanvasElement): Renderer {
             var gl = canvas.getContext('webgl'),
                 VERTEX_SIZE = (4 * 2) + (4 * 2) + (4) + (4 * 3),
@@ -66,56 +67,56 @@ namespace Engine {
                 width = canvas.width,
                 height = canvas.height,
                 shader = CreateShaderProgram(
-                    gl, [`precision lowp float;                  
-                    
+                    gl, [`precision lowp float;
+
                     // IN Vertex Position and
                     // IN Texture Coordinates
                     attribute vec2 a, b;
-                    
+
                     // IN Vertex Color
                     attribute vec4 c;
 
                     // IN Light Value
                     attribute vec3 _l;
-                    
+
                     // OUT Texture Coordinates
                     varying vec2 d;
-                    
+
                     // OUT Vertex Color
                     varying vec4 e;
-                    
+
                     // OUT Light Value
                     varying vec3 l;
-                    
+
                     // CONST View Matrix
                     uniform mat4 m;
                     uniform vec2 r;
-                    
+
                     void main(){
                         gl_Position=m*vec4(a,1.0,1.0);
                         d=b;
                         e=c;
                         l=_l;
-                    }`
+                    }`,
                     ].join('\n'),
                     [`precision lowp float;
                         // OUT Texture Coordinates
                         varying vec2 d;
-                        
+
                         // OUT Vertex Color
                         varying vec4 e;
-                        
+
                         // OUT Light Strength
                         varying vec3 l;
-                        
+
                         // CONST Single Sampler2D
                         uniform sampler2D f;
 
                         void main(){
                             gl_FragColor=texture2D(f,d)*e;
                             gl_FragColor.rgb*=l;
-                        }`
-                    ].join('\n')
+                        }`,
+                    ].join('\n'),
                 ),
                 glBufferSubData = gl.bufferSubData.bind(gl),
                 glDrawElements = gl.drawElements.bind(gl),
@@ -167,8 +168,8 @@ namespace Engine {
                 new Float32Array([
                     2 / width, 0, 0, 0,
                     0, -2 / height, 0, 0,
-                    0, 0, 1, 1, -1, 1, 0, 0
-                ])
+                    0, 0, 1, 1, -1, 1, 0, 0,
+                ]),
             );
             gl.enableVertexAttribArray(locF);
             gl.vertexAttribPointer(locF, 3, 5126, false, VERTEX_SIZE, 20);
@@ -308,10 +309,11 @@ namespace Engine {
                     glBufferSubData(34962, 0, vPositionData.subarray(0, count * VERTEX_SIZE));
                     glDrawElements(4, count * VERTICES_PER_QUAD, 5123, 0);
                     count = 0;
-                }
+                },
             };
             return renderer;
         }
+        // tslint:enable all
 
     }
 }

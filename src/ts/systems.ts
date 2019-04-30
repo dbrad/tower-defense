@@ -69,14 +69,14 @@ namespace System {
         // @endif
 
         if (movingRight.value || movingLeft.value) {
-            let tile = Engine.TileMap.getTile(tileMap, { x: targetTile.value.x, y: tilePos.value.y });
+            const tile = Engine.TileMap.getTile(tileMap, { x: targetTile.value.x, y: tilePos.value.y });
             if (tile && tile.hasCollision) {
                 movingRight.value = movingLeft.value = false;
                 targetTile.value.x = tilePos.value.x;
             }
         }
         if (movingUp.value || movingDown.value) {
-            let tile = Engine.TileMap.getTile(tileMap, { x: tilePos.value.x, y: targetTile.value.y });
+            const tile = Engine.TileMap.getTile(tileMap, { x: tilePos.value.x, y: targetTile.value.y });
             if (tile && tile.hasCollision) {
                 movingUp.value = movingDown.value = false;
                 targetTile.value.y = tilePos.value.y;
@@ -88,13 +88,13 @@ namespace System {
         }
     }
 
-    let ECSStorage: { [key: number]: { [key: string]: any } } = {};
+    const ECSStorage: { [key: number]: { [key: string]: any } } = {};
 
     export function moveEntity(entity: ECS.Entity, tileMap: Engine.TileMap, now: number): void {
-        let tilePos = entity.getComponent<V2>("tilePos");
-        let targetTile = entity.getComponent<V2>("targetTile");
-        let renderPos = entity.getComponent<V2>("renderPos");
-        let moving = entity.getComponent<boolean>("moving");
+        const tilePos = entity.getComponent<V2>("tilePos");
+        const targetTile = entity.getComponent<V2>("targetTile");
+        const renderPos = entity.getComponent<V2>("renderPos");
+        const moving = entity.getComponent<boolean>("moving");
 
         // @ifdef DEBUG
         DEBUG.assert(tilePos != null, "Entity must have a 'tilePos' Position to move.");
@@ -109,14 +109,14 @@ namespace System {
         if (ECSStorage[entity.id]["moveFn"] == null) {
             ECSStorage[entity.id]["moveFn"] = Interpolator(now, 160, Easing.linear);
         }
-        let interp = ECSStorage[entity.id]["moveFn"].next(now);
-        let o = TileToPixel(tilePos.value, tileMap.tileSize);
-        let d = TileToPixel(targetTile.value, tileMap.tileSize);
+        const interp = ECSStorage[entity.id]["moveFn"].next(now);
+        const o = TileToPixel(tilePos.value, tileMap.tileSize);
+        const d = TileToPixel(targetTile.value, tileMap.tileSize);
 
         renderPos.value.x = o.x + Math.round((d.x - o.x) * interp.value);
         renderPos.value.y = o.y + Math.round((d.y - o.y) * interp.value);
 
-        if (interp.done == true) {
+        if (interp.done === true) {
             moving.value = false;
             tilePos.value = CopyV2(targetTile.value);
             renderPos.value = TileToPixel(tilePos.value, tileMap.tileSize);

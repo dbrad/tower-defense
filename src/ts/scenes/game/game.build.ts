@@ -228,6 +228,7 @@ namespace Scenes.Game.SubScenes {
             }
 
             let sel: number = 0;
+            // TODO(dbrad): replace with non function foreach
             options.forEach((option, index, array) => {
                 const text = ecs.addEntity();
                 text.addComponent<V2>("renderPos", { x: 28 * 16, y: 32 + (16 * index) });

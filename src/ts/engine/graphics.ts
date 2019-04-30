@@ -32,7 +32,7 @@ namespace Engine {
             }
 
             export function cloneArray(frames: Frame[]): Frame[] {
-                let result: Frame[] = [];
+                const result: Frame[] = [];
                 frames.forEach((frame, index, array) => {
                     result.push(clone(frame));
                 });
@@ -52,9 +52,11 @@ namespace Engine {
             }
 
             public clone(): Sprite {
-                let sprite = new Sprite(this.animations["DEFAULT"].clone());
-                for (let key in this.animations) {
-                    sprite.addAnimation(key, this.animations[key].clone());
+                const sprite = new Sprite(this.animations["DEFAULT"].clone());
+                for (const key in this.animations) {
+                    if (this.animations.hasOwnProperty(key)) {
+                        sprite.addAnimation(key, this.animations[key].clone());
+                    }
                 }
                 return sprite;
             }
@@ -131,8 +133,10 @@ namespace Engine {
             }
 
             public setColour(colour: Colour): void {
-                for (let key in this.animations) {
-                    this.animations[key].setColour(colour);
+                for (const key in this.animations) {
+                    if (this.animations.hasOwnProperty(key)) {
+                        this.animations[key].setColour(colour);
+                    }
                 }
                 this.animationQueue.forEach(
                     (animation) => {
@@ -141,8 +145,10 @@ namespace Engine {
             }
 
             public setColourHex(colour: number): void {
-                for (let key in this.animations) {
-                    this.animations[key].setColourHex(colour);
+                for (const key in this.animations) {
+                    if (this.animations.hasOwnProperty(key)) {
+                        this.animations[key].setColourHex(colour);
+                    }
                 }
                 this.animationQueue.forEach(
                     (animation) => {
@@ -151,8 +157,10 @@ namespace Engine {
             }
 
             public setRotation(radians: number): void {
-                for (let key in this.animations) {
-                    this.animations[key].setRotation(radians);
+                for (const key in this.animations) {
+                    if (this.animations.hasOwnProperty(key)) {
+                        this.animations[key].setRotation(radians);
+                    }
                 }
                 this.animationQueue.forEach(
                     (animation) => {
@@ -164,15 +172,19 @@ namespace Engine {
         export namespace Sprite {
             export class Animation {
                 public readonly frames: Frame[];
+                public progress: number = 0;
+                public loop: boolean = false;
+                public done: boolean = false;
+
                 get currentFrame(): Frame {
                     if (this.duration === 0) {
                         return this.frames[0];
                     } else {
                         let totalDuration = 0;
-                        for (let i in this.frames) {
-                            totalDuration += this.frames[i].duration;
+                        for (const frame of this.frames) {
+                            totalDuration += frame.duration;
                             if (this.progress <= totalDuration) {
-                                return this.frames[i];
+                                return frame;
                             }
                         }
                         return this.frames[this.frames.length - 1];
@@ -183,16 +195,12 @@ namespace Engine {
                 get duration(): number {
                     if (this._duration === -1) {
                         this._duration = 0;
-                        for (let frame of this.frames) {
+                        for (const frame of this.frames) {
                             this._duration += frame.duration;
                         }
                     }
                     return this._duration;
                 }
-
-                public progress: number = 0;
-                public loop: boolean = false;
-                public done: boolean = false;
 
                 constructor(frames: Frame[]) {
                     this.frames = frames;
@@ -259,7 +267,7 @@ namespace Engine {
             }
 
             export function CreateAndStore(def: SpriteDef): Sprite {
-                let sprite: Sprite =
+                const sprite: Sprite =
                     new Sprite(new Sprite.Animation([
                         {
                             colour: def.animations["DEFAULT"][0].colour || Colour.WHITE,
@@ -307,10 +315,10 @@ namespace Engine {
                 colour: number;
                 tileSize: V2;
             };
-            export function draw(gl: GL.Renderer, ninePatch: NinePatch, tileX: number, tileY: number, tileW: number, tileH: number) {
+            export function draw(gl: GL.Renderer, ninePatch: NinePatch, tileX: number, tileY: number, tileW: number, tileH: number): void {
                 let s: Assets.Texture;
-                let endX = tileX + tileW - 1;
-                let endY = tileY + tileH - 1;
+                const endX = tileX + tileW - 1;
+                const endY = tileY + tileH - 1;
 
                 for (let x = tileX; x <= endX; x++) {
                     for (let y = tileY; y <= endY; y++) {
@@ -348,25 +356,25 @@ namespace Engine {
         }
 
         export namespace Texture {
-            export interface Parameters {
+            export type Parameters = {
                 renderer: GL.Renderer;
                 texture: Assets.Texture;
                 position: V2;
                 scale?: V2;
                 rotation?: number;
                 light?: V3;
-            }
-            export function draw(parameters: Parameters) {
-                let t = parameters.texture;
+            };
+            export function draw(parameters: Parameters): void {
+                const t = parameters.texture;
 
-                let w = t.w;
-                let hw = ~~(w / 2);
-                let h = t.h;
-                let hh = ~~(h / 2);
+                const w = t.w;
+                const hw = ~~(w / 2);
+                const h = t.h;
+                const hh = ~~(h / 2);
 
-                let gl = parameters.renderer;
-                let l = parameters.light ? parameters.light : { x: 1.0, y: 1.0, z: 1.0 };
-                let p = parameters.position;
+                const gl = parameters.renderer;
+                const l = parameters.light ? parameters.light : { x: 1.0, y: 1.0, z: 1.0 };
+                const p = parameters.position;
                 gl.push();
                 gl.trans(p.x + hw, p.y + hh);
                 if (parameters.scale) {
@@ -401,26 +409,26 @@ namespace Engine {
             }
 
             export function draw(gl: GL.Renderer, text: string, position: V2, textAlign: Alignment = Alignment.LEFT, wrap: number = 0): void {
-                let pos = CopyV2(position);
-                let words = text.split(' ');
-                let orgx = pos.x;
+                const pos = CopyV2(position);
+                const words = text.split(" ");
+                const orgx = pos.x;
                 let offx = 0;
-                let lineLength = wrap == 0 ? text.split('').length * 6 : wrap;
+                const lineLength = wrap === 0 ? text.split("").length * 6 : wrap;
                 let alignmentOffset = 0;
-                if (textAlign == Alignment.CENTER) {
+                if (textAlign === Alignment.CENTER) {
                     alignmentOffset = ~~(-lineLength / 2);
                 } else if (textAlign === Alignment.RIGHT) {
                     alignmentOffset = ~~(-lineLength);
                 }
 
-                for (let word of words) {
-                    if (wrap != 0 && offx + word.length * 6 > wrap) {
+                for (const word of words) {
+                    if (wrap !== 0 && offx + word.length * 6 > wrap) {
                         pos.y += 6;
                         offx = 0;
                     }
-                    for (let letter of word.split('')) {
-                        let l = letter.toLowerCase();
-                        let s = Assets.TextureStore[l];
+                    for (const letter of word.split("")) {
+                        const l = letter.toLowerCase();
+                        const s = Assets.TextureStore[l];
                         pos.x = orgx + offx;
 
                         gl.push();

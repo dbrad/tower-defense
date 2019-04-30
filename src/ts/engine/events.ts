@@ -4,22 +4,22 @@ namespace Engine {
 
         export class Manager {
             public subscribers: { [key: string]: { [key: string]: EventHandler[] } } = {};
-            public reset() {
+            public reset(): void {
                 this.subscribers = {};
             }
         }
 
-        export function emit(manager: Manager, object: string, event: string, ...args: any[]) {
+        export function emit(manager: Manager, object: string, event: string, ...args: any[]): void {
             if (manager.subscribers[object] && manager.subscribers[object][event]) {
                 manager.subscribers[object][event].forEach(
                     (handler) => {
                         handler(...args);
-                    }
-                )
+                    },
+                );
             }
         }
 
-        export function on(manager: Manager, object: string, event: string, handler: EventHandler) {
+        export function on(manager: Manager, object: string, event: string, handler: EventHandler): void {
             if (manager.subscribers[object] == null) {
                 manager.subscribers[object] = {};
             }

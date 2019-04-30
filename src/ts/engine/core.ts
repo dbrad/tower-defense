@@ -36,22 +36,22 @@ namespace Engine {
         /* ------------------------------------------------------------------------- */
 
         function update(now: number, delta: number): void {
-            let scene = _scenes.current as Scene;
+            const scene = _scenes.current as Scene;
             if (scene) {
                 scene.update(now, delta);
             }
         }
 
         function render(now: number, delta: number): void {
-            let scene = _scenes.current as Scene;
+            const scene = _scenes.current as Scene;
             _gl.cls();
             if (!paused) {
                 if (scene) {
                     scene.render(_gl, now, delta);
                 }
             } else {
-                let hw = ~~(WIDTH / 2);
-                let hh = ~~(HEIGHT / 2);
+                const hw = ~~(WIDTH / 2);
+                const hh = ~~(HEIGHT / 2);
                 _gl.col = 0xFFFFFFFF;
                 Graphics.Text.draw(_gl, "game paused", { x: hw, y: hh - 8 }, Graphics.Text.Alignment.CENTER);
                 Graphics.Text.draw(_gl, "click here to resume", { x: hw, y: hh + 8 }, Graphics.Text.Alignment.CENTER);
@@ -64,7 +64,7 @@ namespace Engine {
         let _previous: number;
         function loop(now: number): void {
             if (running) {
-                let delta = now - _previous;
+                const delta = now - _previous;
                 _previous = now;
                 // @ifdef DEBUG
                 Stats.tick(delta);
